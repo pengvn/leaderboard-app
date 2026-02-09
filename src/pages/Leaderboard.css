@@ -1,0 +1,177 @@
+.leaderboard-page {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.app-title {
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+}
+
+.subtitle {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.list-container {
+    margin-top: 2rem;
+    padding: 0;
+    overflow: hidden;
+}
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    transition: background 0.2s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.list-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.rank-num {
+    font-weight: 700;
+    color: var(--color-text-muted);
+    width: 40px;
+}
+
+.list-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.list-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.score-num {
+    font-weight: 600;
+    color: #fff;
+    font-family: monospace;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .app-title {
+        font-size: 2rem;
+    }
+
+    .podium-container {
+        flex-wrap: wrap;
+        /* Might break pedestal alignment, usually better to scale down or scroll */
+        transform: scale(0.8);
+        margin-top: 0;
+    }
+}
+
+.no-activity-message {
+    text-align: center;
+    padding: 3rem 1rem;
+    font-size: 1.5rem;
+    color: var(--color-text-muted);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 1rem;
+    margin: 2rem 0;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    min-height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.winner-background {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60vw;
+    height: 60vh;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.15;
+    filter: blur(100px) saturate(1.2);
+    z-index: -1;
+    pointer-events: none;
+    transition: all 1s ease-in-out;
+}
+
+/* Lifecounter Floating Action Button */
+.lifecounter-fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lifecounter-fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(102, 126, 234, 0.6);
+}
+
+.lifecounter-fab:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 600px) {
+    .lifecounter-fab {
+        bottom: 1rem;
+        right: 1rem;
+        width: 56px;
+        height: 56px;
+        font-size: 1.75rem;
+    }
+}

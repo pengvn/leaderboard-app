@@ -1,0 +1,204 @@
+.podium-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 1.5rem;
+    margin-top: 8rem;
+    margin-bottom: 4rem;
+    perspective: 1000px;
+}
+
+.podium-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.podium-item:hover {
+    transform: translateY(-5px);
+}
+
+.avatar-wrapper {
+    position: relative;
+    margin-bottom: 1.5rem;
+    /* Increased spacing for crown */
+    width: 100px;
+    height: 100px;
+    z-index: 5;
+    /* Ensure avatar is above pedestal/crown */
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    /* Or 12px for rounded square */
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s;
+    /* Smooth zoom transition */
+    transform: scale(1.15);
+    /* Zoom effect per user request */
+    z-index: 1;
+    /* Ensure below badge/crown if needed */
+}
+
+/* Hover effect for an interactive feel */
+.podium-item:hover .avatar {
+    transform: scale(1.25);
+}
+
+.rank-badge {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #181926;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-weight: 700;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    z-index: 2;
+}
+
+/* User Specific Glows */
+.user-rekaru .avatar {
+    border-color: var(--color-rekaru);
+    box-shadow: 0 0 20px var(--color-rekaru-glow);
+}
+
+.user-emi .avatar {
+    border-color: var(--color-emi);
+    box-shadow: 0 0 20px var(--color-emi-glow);
+}
+
+.user-pengvn .avatar {
+    border-color: var(--color-pengvn);
+    box-shadow: 0 0 20px var(--color-pengvn-glow);
+}
+
+.user-hwan .avatar {
+    border-color: var(--color-hwan);
+    box-shadow: 0 0 20px var(--color-hwan-glow);
+}
+
+.pedestal {
+    width: 140px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 1.5rem;
+    position: relative;
+    /* overflow: hidden; Removed to fix crown clipping */
+}
+
+.rank-1 .pedestal {
+    height: 220px;
+    box-shadow: 0 -10px 40px rgba(255, 215, 0, 0.1);
+}
+
+.rank-2 .pedestal {
+    height: 160px;
+}
+
+.rank-3 .pedestal {
+    height: 130px;
+}
+
+.crown-icon {
+    font-size: 2.5rem;
+    /* Made slightly larger */
+    position: absolute;
+    top: -55px;
+    /* Moved above the avatar */
+    left: 50%;
+    transform: translateX(-50%) rotate(-5deg);
+    /* Added slight tilt for style */
+    color: #fbbf24;
+    filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.6));
+    z-index: 10;
+    animation: float 3s ease-in-out infinite;
+    /* Optional: gentle float */
+}
+
+@keyframes float {
+    0% {
+        transform: translateX(-50%) rotate(-5deg) translateY(0px);
+    }
+
+    50% {
+        transform: translateX(-50%) rotate(-5deg) translateY(-5px);
+    }
+
+    100% {
+        transform: translateX(-50%) rotate(-5deg) translateY(0px);
+    }
+}
+
+.player-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+    color: #fff;
+}
+
+.player-score {
+    font-weight: 600;
+    color: #7950f2;
+    /* Use theme color? */
+    background: rgba(121, 80, 242, 0.15);
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    font-size: 0.875rem;
+}
+
+/* Dynamic Score Colors */
+.user-rekaru .player-score {
+    color: var(--color-rekaru);
+    background: rgba(255, 71, 87, 0.15);
+}
+
+.user-emi .player-score {
+    color: var(--color-emi);
+    background: rgba(46, 213, 115, 0.15);
+}
+
+.user-pengvn .player-score {
+    color: var(--color-pengvn);
+    background: rgba(241, 242, 246, 0.15);
+}
+
+.user-hwan .player-score {
+    color: var(--color-hwan);
+    background: rgba(30, 144, 255, 0.15);
+}
+
+/* Rank Order display trick: 2, 1, 3 */
+.podium-container .rank-1 {
+    order: 2;
+    z-index: 10;
+    transform: scale(1.1);
+}
+
+.podium-container .rank-2 {
+    order: 1;
+}
+
+.podium-container .rank-3 {
+    order: 3;
+}

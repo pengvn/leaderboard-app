@@ -1,0 +1,636 @@
+/* Lifecounter Styles */
+.lifecounter-app {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(135deg, #181825 0%, #1e1e2e 100%);
+}
+
+/* Screens */
+.lc-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Welcome Screen */
+.lc-welcome {
+  align-items: center;
+  justify-content: center;
+}
+
+.lc-welcome-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.lc-logo {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.lc-subtitle {
+  color: #a0a0b0;
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+}
+
+/* Buttons */
+.lc-btn {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  font-family: inherit;
+}
+
+.lc-btn-primary {
+  background: #6366f1;
+  color: white;
+}
+
+.lc-btn-primary:active {
+  transform: scale(0.95);
+  background: #4f46e5;
+}
+
+.lc-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  backdrop-filter: blur(10px);
+}
+
+.lc-btn-secondary:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.lc-btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.lc-btn-large {
+  padding: 1.5rem 3rem;
+  font-size: 1.3rem;
+}
+
+.lc-btn-block {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.lc-btn-back,
+.lc-btn-menu {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+/* Screen Header */
+.lc-screen-header {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+
+.lc-screen-header h2 {
+  flex: 1;
+  text-align: center;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+/* Game Mode Screen */
+.lc-game-modes {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  flex: 1;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.lc-mode-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid #2a2a3e;
+  border-radius: 16px;
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+
+.lc-mode-card:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #6366f1;
+}
+
+.lc-mode-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.lc-mode-card h3 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.lc-mode-card p {
+  color: #a0a0b0;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Setup Screen */
+.lc-setup-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.lc-player-setup-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 2px solid #2a2a3e;
+}
+
+.lc-player-setup-card h3 {
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  color: white;
+}
+
+.lc-form-group {
+  margin-bottom: 1rem;
+}
+
+.lc-form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #a0a0b0;
+  font-size: 0.9rem;
+}
+
+.lc-form-group input,
+.lc-form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid #2a2a3e;
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.lc-form-group input::placeholder {
+  color: #6b7280;
+}
+
+.lc-color-picker,
+.lc-mana-colors {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.lc-color-option {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lc-color-option.selected {
+  border-color: white;
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.lc-mana-option {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.lc-mana-option.selected {
+  border-color: white;
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.lc-setup-footer {
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+/* Game Screen */
+.lc-game-screen {
+  height: 100vh;
+}
+
+.lc-game-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.lc-turn-tracker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.lc-turn-label {
+  font-size: 0.75rem;
+  color: #a0a0b0;
+}
+
+.lc-turn-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+}
+
+.lc-current-player {
+  flex: 1;
+  text-align: center;
+  font-size: 1rem;
+  color: white;
+  font-weight: 600;
+}
+
+.lc-game-board {
+  flex: 1;
+  display: grid;
+  gap: 1px;
+  background: #181825;
+  overflow: hidden;
+}
+
+.lc-game-board.lc-mode-1v1 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.lc-game-board.lc-mode-2v2,
+.lc-game-board.lc-mode-commander {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+/* Player Panel */
+.lc-player-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.lc-player-panel.active-turn {
+  box-shadow: inset 0 0 30px rgba(255, 215, 0, 0.5);
+}
+
+.lc-player-panel.defeated {
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+.lc-player-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  color: white;
+}
+
+.lc-player-deck {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 1rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.lc-life-counter {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.lc-life-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lc-life-btn:active {
+  transform: scale(0.9);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.lc-life-value {
+  font-size: 4rem;
+  font-weight: 800;
+  min-width: 120px;
+  text-align: center;
+  cursor: pointer;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);
+  color: white;
+  user-select: none;
+}
+
+.lc-mana-display {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+}
+
+.lc-mana-symbol {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.lc-counters-display {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.lc-counter-item {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+  color: white;
+}
+
+.lc-game-footer {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+
+/* Modal */
+.lc-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.lc-modal-content {
+  background: #1e1e2e;
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  min-width: 300px;
+}
+
+.lc-modal-content h3 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  text-align: center;
+  color: white;
+}
+
+/* Player Config Modal */
+.lc-player-config {
+  max-width: 500px;
+}
+
+.lc-config-section {
+  margin-bottom: 1.5rem;
+}
+
+.lc-config-section h4 {
+  margin-bottom: 0.75rem;
+  color: #a0a0b0;
+  font-size: 1rem;
+}
+
+.lc-counter-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.lc-counter-controls label {
+  flex: 1;
+  color: white;
+}
+
+.lc-counter-controls .lc-life-counter {
+  margin: 0;
+}
+
+.lc-counter-controls .lc-life-btn {
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+}
+
+.lc-counter-controls .lc-life-value {
+  font-size: 1.5rem;
+  min-width: 60px;
+}
+
+/* Result Screen */
+.lc-result-screen {
+  align-items: center;
+  justify-content: center;
+}
+
+.lc-result-content {
+  padding: 2rem;
+  width: 100%;
+  max-width: 800px;
+}
+
+.lc-result-content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: white;
+}
+
+.lc-result-summary {
+  margin-bottom: 2rem;
+}
+
+.lc-result-player {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border: 2px solid #2a2a3e;
+}
+
+.lc-result-player.winner {
+  border-color: #ffd700;
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.lc-result-player h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.lc-result-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  color: #a0a0b0;
+  font-size: 0.95rem;
+}
+
+.lc-result-stats strong {
+  color: white;
+}
+
+.lc-result-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+  .lc-logo {
+    font-size: 5rem;
+  }
+
+  .lc-game-modes {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .lc-mode-card {
+    flex: 1;
+  }
+
+  .lc-setup-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .lc-life-value {
+    font-size: 3rem;
+  }
+
+  .lc-life-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+
+  .lc-player-name {
+    font-size: 1rem;
+  }
+
+  .lc-player-deck {
+    font-size: 0.75rem;
+  }
+}
+
+/* Touch improvements */
+@media (hover: none) {
+  .lc-btn:hover {
+    transform: none;
+  }
+
+  .lc-life-btn:hover {
+    transform: none;
+  }
+}
