@@ -454,16 +454,24 @@
 
 /* Jugadores superiores en landscape */
 .lc-game-board.lc-orientation-landscape .lc-player-panel.top-player {
-  /* Invertir fondo verticalmente */
-  background-position: center center;
+  /* Invertir panel completo para que imagen esté de cabeza */
+  flex-direction: column-reverse;
 }
 
 .lc-game-board.lc-orientation-landscape .lc-player-panel.top-player::before {
-  transform: scaleY(-1);
+  transform: scaleY(-1); /* Imagen de fondo de cabeza */
 }
 
+/* Info del jugador va ABAJO en jugadores superiores */
 .lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-player-info-section {
-  transform: rotate(180deg);
+  order: 2;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* Vida va ARRIBA */
+.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-life-counter {
+  order: 1;
 }
 
 .lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-life-value {
@@ -517,12 +525,24 @@
 
 /* Jugadores superiores en portrait */
 .lc-game-board.lc-orientation-portrait .lc-player-panel.top-player {
-  /* Invertir fondo verticalmente */
-  background-position: center center;
+  /* Invertir panel para que imagen esté de cabeza */
+  flex-direction: column-reverse;
 }
 
 .lc-game-board.lc-orientation-portrait .lc-player-panel.top-player::before {
-  transform: scaleY(-1);
+  transform: scaleY(-1); /* Imagen de fondo de cabeza */
+}
+
+/* Info del jugador va ABAJO en jugadores superiores */
+.lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-player-info-section {
+  order: 2;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* Vida va ARRIBA */
+.lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-life-counter {
+  order: 1;
 }
 
 .lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-life-value,
@@ -575,6 +595,9 @@
   right: 0;
   bottom: 0;
   background-color: inherit;
+  background-image: inherit;
+  background-size: inherit;
+  background-position: inherit;
   opacity: 0.7;
   z-index: 0;
 }
