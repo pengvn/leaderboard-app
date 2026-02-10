@@ -46,7 +46,7 @@ const PLAYER_ID_MAP = {
 };
 
 function Lifecounter() {
-  const { logMatch } = useLeaderboard();
+  const { logMatch, updateScore, users: leaderboardUsers } = useLeaderboard();
   const [screen, setScreen] = useState('welcome');
   const [gameMode, setGameMode] = useState(null);
   const [playerCount, setPlayerCount] = useState(0);
@@ -212,42 +212,64 @@ function Lifecounter() {
   };
 
   const saveResults = () => {
-    // Determinar ganador (jugador con más vida)
+    // Ordenar jugadores por vida (mayor a menor) para determinar posiciones
     const sortedPlayers = [...players].sort((a, b) => b.life - a.life);
-    const winner = sortedPlayers[0];
+
+    // Sistema de puntos: 1° = 5pts, 2° = 2pts, 3° = 1pt, 4° = 0pts
+    const pointsSystem = [5, 2, 1, 0];
 
     // Mapear gameMode a modalidad del leaderboard
     const modalityMap = {
       '1v1': '1v1',
       '2v2': '2v2',
       'Commander': 'commander',
-      'Three-way': '1v1' // Asumimos que three-way cuenta como 1v1
+      'Three-way': '1v1'
     };
 
     const modality = modalityMap[gameMode] || '1v1';
 
-    // Convertir colores de maná a formato del leaderboard
-    const manaColorMap = {
-      'W': 'W', 'U': 'U', 'B': 'B', 'R': 'R', 'G': 'G', 'C': 'C'
-    };
-
-    // Preparar datos del match
+    // Preparar datos del match (con estructura correcta para MatchHistory)
     const matchData = {
       modality: modality,
-      winnerId: PLAYER_ID_MAP[winner.name] || winner.name.toLowerCase(),
+      winnerId: PLAYER_ID_MAP[sortedPlayers[0].name] || sortedPlayers[0].name.toLowerCase(),
       players: players.map(p => ({
-        userId: PLAYER_ID_MAP[p.name] || p.name.toLowerCase(),
-        deckName: p.deck || 'Sin nombre',
-        deckColors: p.manaColors.map(c => manaColorMap[c] || c),
+        id: PLAYER_ID_MAP[p.name] || p.name.toLowerCase(), // 'id' no 'userId'
+        deck: p.deck || 'Sin nombre', // 'deck' no 'deckName'
+        colors: p.manaColors || [], // 'colors' no 'deckColors'
         life: p.life
       }))
     };
 
-    // Guardar en el leaderboard
+    // Guardar el match en el historial
     logMatch(matchData);
 
-    console.log('Partida guardada en leaderboard:', matchData);
-    alert('¡Partida guardada en el leaderboard!');
+    // Actualizar puntos de cada jugador según su posición
+    sortedPlayers.forEach((player, index) => {
+      const playerId = PLAYER_ID_MAP[player.name] || player.name.toLowerCase();
+      const points = pointsSystem[index] || 0;
+
+      // Obtener score actual del jugador
+      const user = leaderboardUsers.find(u => u.id === playerId);
+      if (user) {
+        const currentScore = user.scores[modality] || 0;
+        const newScore = currentScore + points;
+
+        // Actualizar score en la modalidad específica
+        updateScore(playerId, modality, newScore);
+
+        // Actualizar score overall
+        const currentOverall = user.scores.overall || 0;
+        updateScore(playerId, 'overall', currentOverall + points);
+      }
+    });
+
+    console.log('Partida guardada:', matchData);
+    console.log('Puntos asignados:', sortedPlayers.map((p, i) => `${p.name}: ${pointsSystem[i] || 0}pts`));
+
+    alert(`¡Partida guardada!\n\nPuntos asignados:\n${sortedPlayers.map((p, i) =>
+      `${i + 1}° ${p.name}: ${pointsSystem[i] || 0} puntos`
+    ).join('\n')}`);
+
     setScreen('welcome');
   };
 
