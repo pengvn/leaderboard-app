@@ -21,6 +21,14 @@ const MANA_COLORS = [
   { symbol: 'C', name: 'Incoloro', color: '#9ca3af' },
 ];
 
+const BACKGROUND_IMAGES = [
+  { id: 'none', name: 'Sin fondo', url: null },
+  { id: 'pengvn', name: 'Pengvn', url: '/assets/pengvn.jpg' },
+  { id: 'rekatria', name: 'Rekatria', url: '/assets/rekaru.jpg' },
+  { id: 'hwan', name: 'Hwan', url: '/assets/hwan.jpg' },
+  { id: 'emi', name: 'Emi', url: '/assets/emi.jpg' },
+];
+
 const COUNTER_TYPES = [
   { id: 'poison', name: 'Veneno', icon: '☠️' },
   { id: 'energy', name: 'Energía', icon: '⚡' },
@@ -38,6 +46,12 @@ function Lifecounter() {
   const [turnNumber, setTurnNumber] = useState(1);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [showRoundChange, setShowRoundChange] = useState(false);
+  const [newRoundNumber, setNewRoundNumber] = useState(1);
+  const [firstPlayer, setFirstPlayer] = useState(0);
+  const [showHighRoll, setShowHighRoll] = useState(false);
+  const [layoutOrientation, setLayoutOrientation] = useState('horizontal'); // 'horizontal' o 'vertical'
+  const [victoryDetected, setVictoryDetected] = useState(false);
 
   const longPressTimer = useRef(null);
   const longPressInterval = useRef(null);
@@ -50,7 +64,7 @@ function Lifecounter() {
         name: PREDEFINED_PLAYERS[i] || `Jugador ${i + 1}`,
         life: life,
         color: PLAYER_COLORS[i % PLAYER_COLORS.length].value,
-        background: null,
+        backgroundImage: null,
         deck: '',
         manaColors: [],
         counters: {},
@@ -68,10 +82,32 @@ function Lifecounter() {
     setScreen('setup');
   };
 
+  // Determinar si un jugador está en la parte superior del tablero
+  const isTopPlayer = (playerId) => {
+    if (layoutOrientation === 'vertical') {
+      // En layout vertical, solo los primeros jugadores están invertidos
+      if (gameMode === '1v1') return playerId === 0;
+      if (gameMode === '2v2' || gameMode === 'Commander') return playerId < 2;
+      if (gameMode === 'Three-way') return playerId === 0;
+    } else {
+      // En layout horizontal
+      if (gameMode === '1v1') return playerId === 0;
+      if (gameMode === '2v2' || gameMode === 'Commander') return playerId < 2;
+      if (gameMode === 'Three-way') return playerId === 0;
+    }
+    return false;
+  };
+
   const startGame = () => {
-    setScreen('game');
-    setCurrentTurn(0);
+    setShowHighRoll(true);
+  };
+
+  const startGameWithFirstPlayer = (playerIndex) => {
+    setFirstPlayer(playerIndex);
+    setCurrentTurn(playerIndex);
     setTurnNumber(1);
+    setShowHighRoll(false);
+    setScreen('game');
   };
 
   const updatePlayer = (playerId, updates) => {
@@ -113,9 +149,18 @@ function Lifecounter() {
 
   const nextTurn = () => {
     const nextPlayer = (currentTurn + 1) % playerCount;
+    const isNewRound = nextPlayer === firstPlayer;
+
     setCurrentTurn(nextPlayer);
-    if (nextPlayer === 0) {
-      setTurnNumber(prev => prev + 1);
+
+    if (isNewRound && turnNumber > 0) {
+      const newRound = turnNumber + 1;
+      setNewRoundNumber(newRound);
+      setShowRoundChange(true);
+      setTimeout(() => {
+        setShowRoundChange(false);
+        setTurnNumber(newRound);
+      }, 2000);
     }
   };
 
@@ -155,10 +200,10 @@ function Lifecounter() {
 
   useEffect(() => {
     const alivePlayers = players.filter(p => p.life > 0);
-    if (screen === 'game' && alivePlayers.length === 1) {
-      setTimeout(() => endGame(), 1000);
+    if (screen === 'game' && alivePlayers.length === 1 && !victoryDetected) {
+      setVictoryDetected(true);
     }
-  }, [players, screen]);
+  }, [players, screen, victoryDetected]);
 
   return (
     <div className="lifecounter-app">
@@ -182,6 +227,23 @@ function Lifecounter() {
             <button className="lc-btn lc-btn-back" onClick={() => setScreen('welcome')}>← Atrás</button>
             <h2>Modo de Juego</h2>
           </div>
+
+          {/* Selector de Orientación */}
+          <div className="lc-orientation-selector">
+            <button
+              className={`lc-orientation-btn ${layoutOrientation === 'horizontal' ? 'active' : ''}`}
+              onClick={() => setLayoutOrientation('horizontal')}
+            >
+              ⬌ Horizontal
+            </button>
+            <button
+              className={`lc-orientation-btn ${layoutOrientation === 'vertical' ? 'active' : ''}`}
+              onClick={() => setLayoutOrientation('vertical')}
+            >
+              ⬍ Vertical
+            </button>
+          </div>
+
           <div className="lc-game-modes">
             <button className="lc-mode-card" onClick={() => selectGameMode('1v1', 2, 20)}>
               <div className="lc-mode-icon">⚔️</div>
@@ -192,6 +254,11 @@ function Lifecounter() {
               <div className="lc-mode-icon">🤝</div>
               <h3>2v2</h3>
               <p>Equipos • 4 jugadores • 20 vidas</p>
+            </button>
+            <button className="lc-mode-card" onClick={() => selectGameMode('Three-way', 3, 20)}>
+              <div className="lc-mode-icon">🔺</div>
+              <h3>Three-way</h3>
+              <p>Free-for-all • 3 jugadores • 20 vidas</p>
             </button>
             <button className="lc-mode-card" onClick={() => selectGameMode('Commander', 4, 40)}>
               <div className="lc-mode-icon">👑</div>
@@ -258,6 +325,26 @@ function Lifecounter() {
                     ))}
                   </div>
                 </div>
+
+                <div className="lc-form-group">
+                  <label>Imagen de Fondo</label>
+                  <div className="lc-background-picker">
+                    {BACKGROUND_IMAGES.map(bg => (
+                      <div
+                        key={bg.id}
+                        className={`lc-background-option ${player.backgroundImage === bg.url ? 'selected' : ''}`}
+                        style={{
+                          backgroundImage: bg.url ? `url(${bg.url})` : 'none',
+                          backgroundColor: bg.url ? 'transparent' : 'rgba(255, 255, 255, 0.1)'
+                        }}
+                        onClick={() => updatePlayer(player.id, { backgroundImage: bg.url })}
+                        title={bg.name}
+                      >
+                        {!bg.url && <span style={{ fontSize: '0.7rem', color: '#666' }}>Sin</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -272,23 +359,15 @@ function Lifecounter() {
       {/* Tablero de Juego */}
       {screen === 'game' && (
         <div className="lc-screen lc-game-screen">
-          <div className="lc-game-header">
-            <button className="lc-btn lc-btn-menu" onClick={() => setShowMenu(true)}>☰</button>
-            <div className="lc-turn-tracker">
-              <span className="lc-turn-label">Ronda</span>
-              <span className="lc-turn-number">{turnNumber}</span>
-            </div>
-            <div className="lc-current-player">
-              {players[currentTurn]?.name}
-            </div>
-          </div>
-
-          <div className={`lc-game-board lc-mode-${gameMode.toLowerCase().replace(/[^a-z0-9]/g, '')}`}>
+          <div className={`lc-game-board lc-mode-${gameMode.toLowerCase().replace(/[^a-z0-9]/g, '')} lc-layout-${layoutOrientation}`}>
             {players.map(player => (
               <div
                 key={player.id}
-                className={`lc-player-panel ${currentTurn === player.id ? 'active-turn' : ''} ${player.life === 0 ? 'defeated' : ''}`}
-                style={{ backgroundColor: player.color }}
+                className={`lc-player-panel ${currentTurn === player.id ? 'active-turn' : ''} ${player.life === 0 ? 'defeated' : ''} ${isTopPlayer(player.id) ? 'top-player' : ''}`}
+                style={{
+                  backgroundColor: player.color,
+                  backgroundImage: player.backgroundImage ? `url(${player.backgroundImage})` : 'none'
+                }}
               >
                 <div className="lc-player-name">{player.name}</div>
                 {player.deck && <div className="lc-player-deck">{player.deck}</div>}
@@ -353,8 +432,22 @@ function Lifecounter() {
                     })}
                   </div>
                 )}
+
+                {/* Indicador de turno activo - Clickeable para avanzar */}
+                {currentTurn === player.id && (
+                  <div className="lc-turn-indicator" onClick={nextTurn}>
+                    <div className="lc-turn-info">
+                      <span className="lc-turn-badge">Ronda {turnNumber}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
+
+            {/* Botón de menú central */}
+            <button className="lc-btn-menu-center" onClick={() => setShowMenu(true)}>
+              ☰
+            </button>
           </div>
 
           <div className="lc-game-footer">
@@ -370,10 +463,17 @@ function Lifecounter() {
         <div className="lc-modal" onClick={() => setShowMenu(false)}>
           <div className="lc-modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Menú de Partida</h3>
+            <div className="lc-menu-info">
+              <p>Ronda: <strong>{turnNumber}</strong></p>
+              <p>Turno actual: <strong>{players[currentTurn]?.name}</strong></p>
+            </div>
+            <button className="lc-btn lc-btn-primary lc-btn-block" onClick={() => { nextTurn(); setShowMenu(false); }}>
+              ▶ Siguiente Turno
+            </button>
             <button className="lc-btn lc-btn-block" onClick={() => setShowMenu(false)}>
               Continuar
             </button>
-            <button className="lc-btn lc-btn-block" onClick={resetGame}>
+            <button className="lc-btn lc-btn-secondary lc-btn-block" onClick={resetGame}>
               Reiniciar Partida
             </button>
             <button className="lc-btn lc-btn-block lc-btn-danger" onClick={endGame}>
@@ -399,6 +499,26 @@ function Lifecounter() {
                     style={{ backgroundColor: color.value }}
                     onClick={() => updatePlayer(selectedPlayer, { color: color.value })}
                   />
+                ))}
+              </div>
+            </div>
+
+            <div className="lc-config-section">
+              <h4>Imagen de Fondo</h4>
+              <div className="lc-background-picker">
+                {BACKGROUND_IMAGES.map(bg => (
+                  <div
+                    key={bg.id}
+                    className={`lc-background-option ${players[selectedPlayer]?.backgroundImage === bg.url ? 'selected' : ''}`}
+                    style={{
+                      backgroundImage: bg.url ? `url(${bg.url})` : 'none',
+                      backgroundColor: bg.url ? 'transparent' : 'rgba(255, 255, 255, 0.1)'
+                    }}
+                    onClick={() => updatePlayer(selectedPlayer, { backgroundImage: bg.url })}
+                    title={bg.name}
+                  >
+                    {!bg.url && <span style={{ fontSize: '0.7rem', color: '#999' }}>Sin</span>}
+                  </div>
                 ))}
               </div>
             </div>
@@ -448,6 +568,56 @@ function Lifecounter() {
             <button className="lc-btn lc-btn-primary lc-btn-block" onClick={() => setSelectedPlayer(null)}>
               Cerrar
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* High Roll Modal */}
+      {showHighRoll && (
+        <div className="lc-modal">
+          <div className="lc-modal-content lc-highroll-modal">
+            <h3>🎲 High Roll</h3>
+            <p className="lc-highroll-text">Selecciona quién comienza la partida</p>
+            <div className="lc-highroll-players">
+              {players.map(player => (
+                <button
+                  key={player.id}
+                  className="lc-highroll-btn"
+                  style={{ borderColor: player.color }}
+                  onClick={() => startGameWithFirstPlayer(player.id)}
+                >
+                  <div className="lc-highroll-player-name">{player.name}</div>
+                  {player.deck && <div className="lc-highroll-deck">{player.deck}</div>}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cartel de Cambio de Ronda */}
+      {showRoundChange && (
+        <div className="lc-round-change-overlay">
+          <div className="lc-round-change-banner">
+            <h2>Ronda {newRoundNumber}</h2>
+          </div>
+        </div>
+      )}
+
+      {/* Notificación de Victoria */}
+      {victoryDetected && screen === 'game' && (
+        <div className="lc-victory-notification">
+          <div className="lc-victory-content">
+            <h2>🏆 Victoria Detectada</h2>
+            <p>Solo queda un jugador con vida</p>
+            <div className="lc-victory-actions">
+              <button className="lc-btn lc-btn-secondary" onClick={() => setVictoryDetected(false)}>
+                Continuar Partida
+              </button>
+              <button className="lc-btn lc-btn-primary" onClick={endGame}>
+                Finalizar
+              </button>
+            </div>
           </div>
         </div>
       )}

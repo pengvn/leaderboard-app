@@ -124,6 +124,38 @@
   margin: 0;
 }
 
+/* Orientation Selector */
+.lc-orientation-selector {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.lc-orientation-btn {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #a0a0b0;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.lc-orientation-btn.active {
+  background: #6366f1;
+  color: white;
+  border-color: #6366f1;
+}
+
+.lc-orientation-btn:active {
+  transform: scale(0.95);
+}
+
 /* Game Mode Screen */
 .lc-game-modes {
   display: flex;
@@ -271,6 +303,12 @@
   height: 100vh;
 }
 
+/* Ocultar header y footer en el modo de juego */
+.lc-game-screen .lc-game-header,
+.lc-game-screen .lc-game-footer {
+  display: none;
+}
+
 .lc-game-header {
   display: flex;
   align-items: center;
@@ -315,6 +353,8 @@
   gap: 1px;
   background: #181825;
   overflow: hidden;
+  position: relative;
+  height: 100vh;
 }
 
 .lc-game-board.lc-mode-1v1 {
@@ -328,6 +368,44 @@
   grid-template-rows: 1fr 1fr;
 }
 
+.lc-game-board.lc-mode-threeway {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  position: relative;
+}
+
+/* Para 3 jugadores: 1 arriba (ocupa 2 columnas), 2 abajo */
+.lc-game-board.lc-mode-threeway .lc-player-panel:first-child {
+  grid-column: 1 / -1;
+}
+
+/* Layouts Verticales */
+.lc-game-board.lc-layout-vertical.lc-mode-1v1 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.lc-game-board.lc-layout-vertical.lc-mode-2v2 {
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(4, 1fr);
+}
+
+.lc-game-board.lc-layout-vertical.lc-mode-threeway {
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.lc-game-board.lc-layout-vertical.lc-mode-threeway .lc-player-panel:first-child {
+  grid-column: auto;
+}
+
+.lc-game-board.lc-layout-vertical.lc-mode-commander {
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(4, 1fr);
+}
+
+/* Layouts Horizontales (por defecto) ya están definidos arriba */
+
 /* Player Panel */
 .lc-player-panel {
   position: relative;
@@ -338,6 +416,40 @@
   padding: 1.5rem;
   overflow: hidden;
   transition: all 0.3s ease;
+  border-radius: 20px;
+  margin: 4px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Overlay semiopaco para fondos personalizados */
+.lc-player-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: inherit;
+  opacity: 0.7;
+  z-index: 0;
+}
+
+.lc-player-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+.lc-player-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .lc-player-panel.active-turn {
@@ -347,6 +459,24 @@
 .lc-player-panel.defeated {
   opacity: 0.5;
   filter: grayscale(100%);
+}
+
+/* Jugadores superiores - números y elementos invertidos */
+.lc-player-panel.top-player .lc-life-value,
+.lc-player-panel.top-player .lc-life-btn {
+  transform: rotate(180deg);
+}
+
+.lc-player-panel.top-player .lc-player-name,
+.lc-player-panel.top-player .lc-player-deck,
+.lc-player-panel.top-player .lc-mana-display,
+.lc-player-panel.top-player .lc-counters-display {
+  transform: rotate(180deg);
+}
+
+/* Mantener el indicador de turno normal incluso en jugadores superiores */
+.lc-player-panel.top-player .lc-turn-indicator {
+  transform: rotate(180deg);
 }
 
 .lc-player-name {
@@ -438,6 +568,90 @@
   color: white;
 }
 
+/* Indicador de turno activo - Abajo a la derecha */
+.lc-turn-indicator {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  background: rgba(255, 215, 0, 0.95);
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+  animation: pulse-glow 2s ease-in-out infinite;
+  z-index: 10;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.lc-turn-indicator:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.7);
+}
+
+.lc-turn-indicator:active {
+  transform: scale(0.95);
+}
+
+.lc-turn-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lc-turn-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e1e2e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(255, 215, 0, 0.8);
+  }
+}
+
+/* Botón de menú central */
+.lc-btn-menu-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+
+.lc-btn-menu-center:hover {
+  background: rgba(0, 0, 0, 0.85);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.lc-btn-menu-center:active {
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
 .lc-game-footer {
   padding: 1rem;
   background: rgba(0, 0, 0, 0.3);
@@ -476,6 +690,25 @@
   font-size: 1.5rem;
   text-align: center;
   color: white;
+}
+
+.lc-menu-info {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.lc-menu-info p {
+  margin: 0.5rem 0;
+  color: #a0a0b0;
+  font-size: 0.95rem;
+}
+
+.lc-menu-info strong {
+  color: white;
+  font-size: 1.1rem;
 }
 
 /* Player Config Modal */
@@ -624,6 +857,193 @@
   }
 }
 
+/* High Roll Modal */
+.lc-highroll-modal {
+  min-width: 320px;
+  max-width: 600px;
+}
+
+.lc-highroll-text {
+  text-align: center;
+  color: #a0a0b0;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.lc-highroll-players {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.lc-highroll-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  font-family: inherit;
+}
+
+.lc-highroll-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.lc-highroll-btn:active {
+  transform: scale(0.95);
+}
+
+.lc-highroll-player-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.lc-highroll-deck {
+  font-size: 0.9rem;
+  color: #a0a0b0;
+}
+
+/* Cartel de Cambio de Ronda */
+.lc-round-change-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+}
+
+.lc-round-change-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 3rem 5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+  animation: bounceIn 0.5s ease;
+}
+
+.lc-round-change-banner h2 {
+  font-size: 4rem;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Notificación de Victoria */
+.lc-victory-notification {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1500;
+  animation: slideUp 0.4s ease;
+}
+
+.lc-victory-content {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  padding: 2rem 3rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(255, 215, 0, 0.6);
+  text-align: center;
+}
+
+.lc-victory-content h2 {
+  color: #1e1e2e;
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 800;
+}
+
+.lc-victory-content p {
+  color: #1e1e2e;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.1rem;
+}
+
+.lc-victory-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+/* Selector de fondos */
+.lc-background-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.lc-background-option {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.lc-background-option.selected {
+  border-color: white;
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.lc-background-option:hover {
+  transform: scale(1.05);
+}
+
 /* Touch improvements */
 @media (hover: none) {
   .lc-btn:hover {
@@ -631,6 +1051,14 @@
   }
 
   .lc-life-btn:hover {
+    transform: none;
+  }
+
+  .lc-highroll-btn:hover {
+    transform: none;
+  }
+
+  .lc-background-option:hover {
     transform: none;
   }
 }
