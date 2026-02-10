@@ -54,6 +54,7 @@ function Lifecounter() {
   const [seatAssignment, setSeatAssignment] = useState({}); // {seatIndex: playerName}
   const [assigningPlayer, setAssigningPlayer] = useState(null); // Jugador siendo asignado
   const [showSeatAssignment, setShowSeatAssignment] = useState(false);
+  const [deviceOrientation, setDeviceOrientation] = useState('portrait'); // 'portrait' o 'landscape'
 
   const longPressTimer = useRef(null);
   const longPressInterval = useRef(null);
@@ -250,6 +251,23 @@ function Lifecounter() {
             <h2>Modo de Juego</h2>
           </div>
 
+          {/* Selector de Orientación del Dispositivo */}
+          <div className="lc-orientation-selector">
+            <p className="lc-orientation-label">Orientación del dispositivo:</p>
+            <button
+              className={`lc-orientation-btn ${deviceOrientation === 'portrait' ? 'active' : ''}`}
+              onClick={() => setDeviceOrientation('portrait')}
+            >
+              📱 Vertical
+            </button>
+            <button
+              className={`lc-orientation-btn ${deviceOrientation === 'landscape' ? 'active' : ''}`}
+              onClick={() => setDeviceOrientation('landscape')}
+            >
+              📱 Horizontal
+            </button>
+          </div>
+
           <div className="lc-game-modes">
             <button className="lc-mode-card" onClick={() => selectGameMode('1v1', 2, 20)}>
               <div className="lc-mode-icon">⚔️</div>
@@ -365,7 +383,7 @@ function Lifecounter() {
       {/* Tablero de Juego */}
       {screen === 'game' && (
         <div className="lc-screen lc-game-screen">
-          <div className={`lc-game-board lc-mode-${gameMode.toLowerCase().replace(/[^a-z0-9]/g, '')}`}>
+          <div className={`lc-game-board lc-mode-${gameMode.toLowerCase().replace(/[^a-z0-9]/g, '')} lc-orientation-${deviceOrientation}`}>
             {players.map(player => (
               <div
                 key={player.id}

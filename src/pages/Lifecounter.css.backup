@@ -386,15 +386,32 @@
   grid-column: 1 / -1;
 }
 
-/* ========================================
-   ORIENTACIÓN DEL DISPOSITIVO - MANUAL
-   ======================================== */
+/* Orientación LANDSCAPE - Forzada manualmente o por media query */
+.lc-game-board.lc-orientation-landscape .lc-player-panel,
+@media (orientation: landscape) {
+  .lc-game-board:not(.lc-orientation-portrait) .lc-player-panel {
+    /* En landscape, reorganizar el contenido del asiento */
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+  }
+}
 
-/* LANDSCAPE - Selector manual */
 .lc-game-board.lc-orientation-landscape .lc-player-panel {
-  flex-direction: row !important;
+  flex-direction: row;
   justify-content: space-between;
   padding: 1rem 2rem;
+}
+
+/* Estilos landscape aplicados con clase manual */
+.lc-game-board.lc-orientation-landscape .lc-player-info-section,
+@media (orientation: landscape) {
+  .lc-game-board:not(.lc-orientation-portrait) .lc-player-info-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
 }
 
 .lc-game-board.lc-orientation-landscape .lc-player-info-section {
@@ -404,88 +421,126 @@
   gap: 0.5rem;
 }
 
-.lc-game-board.lc-orientation-landscape .lc-life-counter {
-  flex-direction: row;
-  gap: 1.5rem;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
+  /* Contador de vida más compacto en landscape */
+  .lc-life-counter {
+    flex-direction: row;
+    gap: 1.5rem;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .lc-life-btn {
+    width: 70px;
+    height: 70px;
+  }
+
+  .lc-life-value {
+    font-size: 5rem;
+    min-width: 150px;
+  }
+
+  /* Asegurar que - siempre esté a la izquierda y + a la derecha */
+  .lc-life-counter {
+    order: 2;
+  }
+
+  /* Ajustar tamaños en landscape */
+  .lc-player-name {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .lc-player-deck {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .lc-mana-display {
+    margin-bottom: 0.5rem;
+  }
+
+  .lc-mana-symbol {
+    width: 26px;
+    height: 26px;
+    font-size: 0.8rem;
+  }
+
+  .lc-counters-display {
+    font-size: 0.85rem;
+  }
+
+  /* Fondo adaptado para landscape */
+  .lc-player-panel {
+    background-size: cover;
+    background-position: center center;
+  }
+
+  /* Turn indicator mantiene su posición bottom-right */
+  .lc-turn-indicator {
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  /* Para jugadores superiores en landscape */
+  .lc-player-panel.top-player .lc-player-info-section {
+    transform: rotate(180deg);
+  }
+
+  .lc-player-panel.top-player .lc-life-counter {
+    flex-direction: row-reverse; /* Invertir orden de botones */
+  }
+
+  .lc-player-panel.top-player .lc-life-value {
+    transform: rotate(180deg);
+  }
+
+  /* El fondo se mantiene sin rotar en landscape */
+  .lc-player-panel.top-player {
+    background-position: center center;
+  }
+
+  /* Indicador de turno para jugadores superiores en landscape */
+  .lc-player-panel.top-player .lc-turn-indicator {
+    /* La caja mantiene su posición bottom-right */
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
+    transform: rotate(180deg);
+  }
 }
 
-.lc-game-board.lc-orientation-landscape .lc-life-btn {
-  width: 70px;
-  height: 70px;
-}
+/* Portrait: Layout vertical por defecto */
+@media (orientation: portrait) {
+  .lc-player-panel {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 
-.lc-game-board.lc-orientation-landscape .lc-life-value {
-  font-size: 5rem;
-  min-width: 150px;
-}
+  .lc-player-info-section {
+    width: 100%;
+    align-items: center;
+  }
 
-.lc-game-board.lc-orientation-landscape .lc-player-name {
-  font-size: 1.1rem;
-  margin-bottom: 0.25rem;
-}
+  .lc-life-counter {
+    flex-direction: row;
+  }
 
-.lc-game-board.lc-orientation-landscape .lc-player-deck {
-  font-size: 0.8rem;
-  margin-bottom: 0.5rem;
-}
+  /* En portrait, el orden normal de botones es correcto */
+  .lc-life-btn:first-child {
+    order: 1; /* botón - */
+  }
 
-.lc-game-board.lc-orientation-landscape .lc-mana-symbol {
-  width: 26px;
-  height: 26px;
-  font-size: 0.8rem;
-}
+  .lc-life-value {
+    order: 2;
+  }
 
-/* Jugadores superiores en landscape */
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-player-info-section {
-  transform: rotate(180deg);
-}
-
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-life-counter {
-  flex-direction: row-reverse;
-}
-
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-life-value {
-  transform: rotate(180deg);
-}
-
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
-  transform: rotate(180deg);
-}
-
-/* PORTRAIT - Selector manual */
-.lc-game-board.lc-orientation-portrait .lc-player-panel {
-  flex-direction: column !important;
-  justify-content: center;
-  align-items: center;
-}
-
-.lc-game-board.lc-orientation-portrait .lc-player-info-section {
-  width: 100%;
-  align-items: center;
-}
-
-.lc-game-board.lc-orientation-portrait .lc-life-counter {
-  flex-direction: row;
-}
-
-/* Jugadores superiores en portrait */
-.lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-life-value,
-.lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-life-btn {
-  transform: rotate(180deg);
-}
-
-.lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-player-name,
-.lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-player-deck,
-.lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-mana-display,
-.lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-counters-display {
-  transform: rotate(180deg);
-}
-
-.lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
-  transform: rotate(180deg);
+  .lc-life-btn:last-child {
+    order: 3; /* botón + */
+  }
 }
 
 /* Player Panel */
@@ -551,7 +606,25 @@
   filter: grayscale(100%);
 }
 
-/* Ya gestionado en la sección de orientación manual arriba */
+/* Jugadores superiores en PORTRAIT - números y elementos invertidos */
+@media (orientation: portrait) {
+  .lc-player-panel.top-player .lc-life-value,
+  .lc-player-panel.top-player .lc-life-btn {
+    transform: rotate(180deg);
+  }
+
+  .lc-player-panel.top-player .lc-player-name,
+  .lc-player-panel.top-player .lc-player-deck,
+  .lc-player-panel.top-player .lc-mana-display,
+  .lc-player-panel.top-player .lc-counters-display {
+    transform: rotate(180deg);
+  }
+
+  /* Rotar solo el CONTENIDO del indicador de turno para jugadores superiores */
+  .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
+    transform: rotate(180deg);
+  }
+}
 
 .lc-player-name {
   font-size: 1.2rem;
