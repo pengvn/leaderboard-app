@@ -392,24 +392,38 @@
 
 /* LANDSCAPE - Selector manual */
 .lc-game-board.lc-orientation-landscape .lc-player-panel {
-  flex-direction: row !important;
-  justify-content: space-between;
+  flex-direction: column !important;
+  justify-content: center;
+  align-items: center;
   padding: 1rem 2rem;
 }
 
 .lc-game-board.lc-orientation-landscape .lc-player-info-section {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 0.5rem;
 }
 
 .lc-game-board.lc-orientation-landscape .lc-life-counter {
   flex-direction: row;
-  gap: 1.5rem;
-  flex: 1;
+  gap: 2rem;
   justify-content: center;
   align-items: center;
+}
+
+/* Asegurar orden correcto: - a la izquierda, + a la derecha */
+.lc-game-board.lc-orientation-landscape .lc-life-btn:first-child {
+  order: 1; /* botón - */
+}
+
+.lc-game-board.lc-orientation-landscape .lc-life-value {
+  order: 2;
+}
+
+.lc-game-board.lc-orientation-landscape .lc-life-btn:last-child {
+  order: 3; /* botón + */
 }
 
 .lc-game-board.lc-orientation-landscape .lc-life-btn {
@@ -439,16 +453,33 @@
 }
 
 /* Jugadores superiores en landscape */
+.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player {
+  /* Invertir fondo verticalmente */
+  background-position: center center;
+}
+
+.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player::before {
+  transform: scaleY(-1);
+}
+
 .lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-player-info-section {
   transform: rotate(180deg);
 }
 
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-life-counter {
-  flex-direction: row-reverse;
-}
-
 .lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-life-value {
   transform: rotate(180deg);
+}
+
+.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-life-btn {
+  transform: rotate(180deg);
+}
+
+/* Box de ronda para jugadores superiores: arriba-izquierda */
+.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-turn-indicator {
+  top: 1rem;
+  left: 1rem;
+  bottom: auto;
+  right: auto;
 }
 
 .lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
@@ -471,7 +502,29 @@
   flex-direction: row;
 }
 
+/* Asegurar orden correcto en portrait: - izquierda, + derecha */
+.lc-game-board.lc-orientation-portrait .lc-life-btn:first-child {
+  order: 1; /* botón - */
+}
+
+.lc-game-board.lc-orientation-portrait .lc-life-value {
+  order: 2;
+}
+
+.lc-game-board.lc-orientation-portrait .lc-life-btn:last-child {
+  order: 3; /* botón + */
+}
+
 /* Jugadores superiores en portrait */
+.lc-game-board.lc-orientation-portrait .lc-player-panel.top-player {
+  /* Invertir fondo verticalmente */
+  background-position: center center;
+}
+
+.lc-game-board.lc-orientation-portrait .lc-player-panel.top-player::before {
+  transform: scaleY(-1);
+}
+
 .lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-life-value,
 .lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-life-btn {
   transform: rotate(180deg);
@@ -482,6 +535,14 @@
 .lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-mana-display,
 .lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-counters-display {
   transform: rotate(180deg);
+}
+
+/* Box de ronda para jugadores superiores en portrait: arriba-izquierda */
+.lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-turn-indicator {
+  top: 1rem;
+  left: 1rem;
+  bottom: auto;
+  right: auto;
 }
 
 .lc-game-board.lc-orientation-portrait .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
