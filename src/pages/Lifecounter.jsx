@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLeaderboard } from '../context/LeaderboardContext';
 import './Lifecounter.css';
 
 const PREDEFINED_PLAYERS = ['Pengvn', 'Rekatria', 'Hwan', 'Emi'];
@@ -36,7 +37,16 @@ const COUNTER_TYPES = [
   { id: 'experience', name: 'Experiencia', icon: '⭐' },
 ];
 
+// Mapeo de nombres a IDs del leaderboard
+const PLAYER_ID_MAP = {
+  'Pengvn': 'pengvn',
+  'Rekatria': 'rekaru',
+  'Hwan': 'hwan',
+  'Emi': 'emi'
+};
+
 function Lifecounter() {
+  const { logMatch } = useLeaderboard();
   const [screen, setScreen] = useState('welcome');
   const [gameMode, setGameMode] = useState(null);
   const [playerCount, setPlayerCount] = useState(0);
@@ -202,22 +212,42 @@ function Lifecounter() {
   };
 
   const saveResults = () => {
-    const gameData = {
-      mode: gameMode,
-      date: new Date().toISOString(),
-      turnNumber: turnNumber,
-      players: players.map(p => ({
-        name: p.name,
-        finalLife: p.life,
-        deck: p.deck,
-        manaColors: p.manaColors,
-        position: p.position,
-        counters: p.counters,
-      })),
+    // Determinar ganador (jugador con más vida)
+    const sortedPlayers = [...players].sort((a, b) => b.life - a.life);
+    const winner = sortedPlayers[0];
+
+    // Mapear gameMode a modalidad del leaderboard
+    const modalityMap = {
+      '1v1': '1v1',
+      '2v2': '2v2',
+      'Commander': 'commander',
+      'Three-way': '1v1' // Asumimos que three-way cuenta como 1v1
     };
 
-    console.log('Datos de la partida:', gameData);
-    alert('Información guardada (preparada para enviar a leaderboard)');
+    const modality = modalityMap[gameMode] || '1v1';
+
+    // Convertir colores de maná a formato del leaderboard
+    const manaColorMap = {
+      'W': 'W', 'U': 'U', 'B': 'B', 'R': 'R', 'G': 'G', 'C': 'C'
+    };
+
+    // Preparar datos del match
+    const matchData = {
+      modality: modality,
+      winnerId: PLAYER_ID_MAP[winner.name] || winner.name.toLowerCase(),
+      players: players.map(p => ({
+        userId: PLAYER_ID_MAP[p.name] || p.name.toLowerCase(),
+        deckName: p.deck || 'Sin nombre',
+        deckColors: p.manaColors.map(c => manaColorMap[c] || c),
+        life: p.life
+      }))
+    };
+
+    // Guardar en el leaderboard
+    logMatch(matchData);
+
+    console.log('Partida guardada en leaderboard:', matchData);
+    alert('¡Partida guardada en el leaderboard!');
     setScreen('welcome');
   };
 
@@ -494,7 +524,25 @@ function Lifecounter() {
             <div className="lc-menu-info">
               <p>Ronda: <strong>{turnNumber}</strong></p>
               <p>Turno actual: <strong>{players[currentTurn]?.name}</strong></p>
+              <p>Orientación: <strong>{deviceOrientation === 'portrait' ? 'Vertical' : 'Horizontal'}</strong></p>
             </div>
+
+            {/* Cambiar orientación durante la partida */}
+            <div className="lc-orientation-toggle">
+              <button
+                className={`lc-orientation-toggle-btn ${deviceOrientation === 'portrait' ? 'active' : ''}`}
+                onClick={() => setDeviceOrientation('portrait')}
+              >
+                📱 Vertical
+              </button>
+              <button
+                className={`lc-orientation-toggle-btn ${deviceOrientation === 'landscape' ? 'active' : ''}`}
+                onClick={() => setDeviceOrientation('landscape')}
+              >
+                📱 Horizontal
+              </button>
+            </div>
+
             <button className="lc-btn lc-btn-primary lc-btn-block" onClick={() => { nextTurn(); setShowMenu(false); }}>
               ▶ Siguiente Turno
             </button>

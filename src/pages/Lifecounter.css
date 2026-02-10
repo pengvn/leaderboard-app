@@ -869,6 +869,40 @@
   font-size: 1.1rem;
 }
 
+/* Toggle de orientación en el menú */
+.lc-orientation-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem;
+  border-radius: 10px;
+}
+
+.lc-orientation-toggle-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #a0a0b0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.lc-orientation-toggle-btn.active {
+  background: #6366f1;
+  color: white;
+  border-color: #6366f1;
+}
+
+.lc-orientation-toggle-btn:active {
+  transform: scale(0.95);
+}
+
 /* Player Config Modal */
 .lc-player-config {
   max-width: 500px;
