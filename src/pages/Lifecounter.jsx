@@ -50,7 +50,6 @@ function Lifecounter() {
   const [newRoundNumber, setNewRoundNumber] = useState(1);
   const [firstPlayer, setFirstPlayer] = useState(0);
   const [showHighRoll, setShowHighRoll] = useState(false);
-  const [contentOrientation, setContentOrientation] = useState('horizontal'); // 'horizontal' o 'vertical'
   const [victoryDetected, setVictoryDetected] = useState(false);
   const [seatAssignment, setSeatAssignment] = useState({}); // {seatIndex: playerName}
   const [assigningPlayer, setAssigningPlayer] = useState(null); // Jugador siendo asignado
@@ -251,23 +250,6 @@ function Lifecounter() {
             <h2>Modo de Juego</h2>
           </div>
 
-          {/* Selector de Orientación de Contenido */}
-          <div className="lc-orientation-selector">
-            <p className="lc-orientation-label">Orientación del contenido:</p>
-            <button
-              className={`lc-orientation-btn ${contentOrientation === 'horizontal' ? 'active' : ''}`}
-              onClick={() => setContentOrientation('horizontal')}
-            >
-              ⬌ Horizontal
-            </button>
-            <button
-              className={`lc-orientation-btn ${contentOrientation === 'vertical' ? 'active' : ''}`}
-              onClick={() => setContentOrientation('vertical')}
-            >
-              ⬍ Vertical
-            </button>
-          </div>
-
           <div className="lc-game-modes">
             <button className="lc-mode-card" onClick={() => selectGameMode('1v1', 2, 20)}>
               <div className="lc-mode-icon">⚔️</div>
@@ -387,32 +369,49 @@ function Lifecounter() {
             {players.map(player => (
               <div
                 key={player.id}
-                className={`lc-player-panel lc-content-${contentOrientation} ${currentTurn === player.id ? 'active-turn' : ''} ${player.life === 0 ? 'defeated' : ''} ${isTopPlayer(player.id) ? 'top-player' : ''}`}
+                className={`lc-player-panel ${currentTurn === player.id ? 'active-turn' : ''} ${player.life === 0 ? 'defeated' : ''} ${isTopPlayer(player.id) ? 'top-player' : ''}`}
                 style={{
                   backgroundColor: player.color,
                   backgroundImage: player.backgroundImage ? `url(${player.backgroundImage})` : 'none'
                 }}
               >
-                <div className="lc-player-name">{player.name}</div>
-                {player.deck && <div className="lc-player-deck">{player.deck}</div>}
+                {/* Sección de información del jugador */}
+                <div className="lc-player-info-section">
+                  <div className="lc-player-name">{player.name}</div>
+                  {player.deck && <div className="lc-player-deck">{player.deck}</div>}
 
-                {player.manaColors.length > 0 && (
-                  <div className="lc-mana-display">
-                    {player.manaColors.map(symbol => {
-                      const mana = MANA_COLORS.find(m => m.symbol === symbol);
-                      return (
-                        <div
-                          key={symbol}
-                          className="lc-mana-symbol"
-                          style={{ backgroundColor: mana.color, color: symbol === 'W' ? '#000' : '#fff' }}
-                        >
-                          {symbol}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                  {player.manaColors.length > 0 && (
+                    <div className="lc-mana-display">
+                      {player.manaColors.map(symbol => {
+                        const mana = MANA_COLORS.find(m => m.symbol === symbol);
+                        return (
+                          <div
+                            key={symbol}
+                            className="lc-mana-symbol"
+                            style={{ backgroundColor: mana.color, color: symbol === 'W' ? '#000' : '#fff' }}
+                          >
+                            {symbol}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
 
+                  {Object.keys(player.counters).length > 0 && (
+                    <div className="lc-counters-display">
+                      {Object.entries(player.counters).map(([type, value]) => {
+                        const counter = COUNTER_TYPES.find(c => c.id === type);
+                        return value > 0 && (
+                          <div key={type} className="lc-counter-item">
+                            {counter?.icon} {value}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Sección de contador de vida */}
                 <div className="lc-life-counter">
                   <button
                     className="lc-life-btn"
@@ -443,19 +442,6 @@ function Lifecounter() {
                     +
                   </button>
                 </div>
-
-                {Object.keys(player.counters).length > 0 && (
-                  <div className="lc-counters-display">
-                    {Object.entries(player.counters).map(([type, value]) => {
-                      const counter = COUNTER_TYPES.find(c => c.id === type);
-                      return value > 0 && (
-                        <div key={type} className="lc-counter-item">
-                          {counter?.icon} {value}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
 
                 {/* Indicador de turno activo - Clickeable para avanzar */}
                 {currentTurn === player.id && (
