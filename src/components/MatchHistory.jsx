@@ -1,6 +1,14 @@
 import React from 'react';
 import './MatchHistory.css';
 
+const MANA_IMAGES = {
+    'W': '/white-mana.png',
+    'U': '/blue-mana.png',
+    'B': '/black-mana.png',
+    'R': '/red-mana.png',
+    'G': '/green-mana.png'
+};
+
 const MatchHistory = ({ matches, users }) => {
     const getUser = (id) => users.find(u => u.id === id) || { name: 'Unknown' };
 
@@ -35,7 +43,16 @@ const MatchHistory = ({ matches, users }) => {
                                                     <span>{p.deck}</span>
                                                     {p.colors && p.colors.length > 0 && (
                                                         <span className="colors">
-                                                            {p.colors.map(c => <span key={c} className={`dot dot-${c}`} />)}
+                                                            {p.colors.map(c =>
+                                                                MANA_IMAGES[c] ? (
+                                                                    <img
+                                                                        key={c}
+                                                                        src={MANA_IMAGES[c]}
+                                                                        alt={c}
+                                                                        className="mana-icon"
+                                                                    />
+                                                                ) : null
+                                                            )}
                                                         </span>
                                                     )}
                                                 </div>

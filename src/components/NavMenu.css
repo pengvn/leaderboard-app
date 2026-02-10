@@ -1,0 +1,216 @@
+/* Botón hamburguesa - Poco visible */
+.nav-menu-toggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 0;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  opacity: 0.3;
+}
+
+.nav-menu-toggle:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-menu-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: white;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Overlay oscuro */
+.nav-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1001;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Menú lateral */
+.nav-menu {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 280px;
+  height: 100%;
+  background: linear-gradient(180deg, #1e1e2e 0%, #181825 100%);
+  z-index: 1002;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+  transition: left 0.3s ease;
+}
+
+.nav-menu.open {
+  left: 0;
+}
+
+/* Header del menú */
+.nav-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-menu-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.nav-menu-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.nav-menu-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Items del menú */
+.nav-menu-items {
+  flex: 1;
+  padding: 1rem 0;
+}
+
+.nav-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  color: #a0a0b0;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: inherit;
+  border-left: 3px solid transparent;
+}
+
+.nav-menu-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.nav-menu-item.active {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  border-left-color: #6366f1;
+}
+
+.nav-icon {
+  font-size: 1.5rem;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-text {
+  flex: 1;
+}
+
+/* Footer del menú */
+.nav-menu-footer {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.nav-menu-footer p {
+  margin: 0;
+  color: #a0a0b0;
+  font-size: 0.9rem;
+}
+
+.nav-version {
+  font-size: 0.75rem !important;
+  margin-top: 0.25rem !important;
+  opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-menu-toggle {
+    top: 0.5rem;
+    left: 0.5rem;
+    width: 36px;
+    height: 36px;
+    gap: 4px;
+    opacity: 0.2;
+  }
+
+  .nav-menu-toggle span {
+    width: 18px;
+    height: 1.5px;
+  }
+
+  .nav-menu {
+    width: 85%;
+    max-width: 320px;
+  }
+
+  .nav-menu-header {
+    padding: 1rem;
+  }
+
+  .nav-menu-header h3 {
+    font-size: 1rem;
+  }
+
+  .nav-menu-item {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .nav-icon {
+    font-size: 1.3rem;
+    width: 28px;
+  }
+}

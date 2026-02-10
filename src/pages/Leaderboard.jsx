@@ -4,6 +4,7 @@ import { useLeaderboard } from '../context/LeaderboardContext';
 import Tabs from '../components/Tabs';
 import Podium from '../components/Podium';
 import MatchHistory from '../components/MatchHistory';
+import NavMenu from '../components/NavMenu';
 import './Leaderboard.css';
 
 const Leaderboard = () => {
@@ -29,6 +30,7 @@ const Leaderboard = () => {
 
     return (
         <div className="leaderboard-page container">
+            <NavMenu />
             <header className="page-header">
                 <h1 className="app-title">PLANESWALKERS LEAGUE</h1>
                 <p className="subtitle">Season 2026</p>
@@ -87,8 +89,21 @@ const Leaderboard = () => {
                 className="lifecounter-fab"
                 title="Abrir Lifecounter"
             >
-                ⚡
+                <img src="/logo-lifecounter.png" alt="Lifecounter" className="fab-logo" />
             </button>
+
+            {/* Footer */}
+            <footer className="leaderboard-footer">
+                <div className="footer-content">
+                    <button onClick={() => navigate('/')} className="footer-link">
+                        Leaderboard
+                    </button>
+                    <button onClick={() => navigate('/lifecounter')} className="footer-lifecounter-btn">
+                        <img src="/logo-lifecounter.png" alt="Lifecounter" />
+                        <span>Lifecounter</span>
+                    </button>
+                </div>
+            </footer>
         </div>
     );
 };

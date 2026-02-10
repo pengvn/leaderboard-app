@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLeaderboard } from '../context/LeaderboardContext';
+import NavMenu from '../components/NavMenu';
 import './Lifecounter.css';
 
 const PREDEFINED_PLAYERS = ['Pengvn', 'Rekatria', 'Hwan', 'Emi'];
 
 const PLAYER_COLORS = [
+  { name: 'Blanco', value: '#f5f5f5' },
   { name: 'Azul Oscuro', value: '#1e3a8a' },
   { name: 'Rojo Oscuro', value: '#7f1d1d' },
   { name: 'Verde Oscuro', value: '#14532d' },
@@ -14,12 +16,11 @@ const PLAYER_COLORS = [
 ];
 
 const MANA_COLORS = [
-  { symbol: 'W', name: 'Blanco', color: '#f9fafb' },
-  { symbol: 'U', name: 'Azul', color: '#3b82f6' },
-  { symbol: 'B', name: 'Negro', color: '#1f2937' },
-  { symbol: 'R', name: 'Rojo', color: '#ef4444' },
-  { symbol: 'G', name: 'Verde', color: '#22c55e' },
-  { symbol: 'C', name: 'Incoloro', color: '#9ca3af' },
+  { symbol: 'W', name: 'Blanco', color: '#f9fafb', image: '/white-mana.png' },
+  { symbol: 'U', name: 'Azul', color: '#3b82f6', image: '/blue-mana.png' },
+  { symbol: 'B', name: 'Negro', color: '#1f2937', image: '/black-mana.png' },
+  { symbol: 'R', name: 'Rojo', color: '#ef4444', image: '/red-mana.png' },
+  { symbol: 'G', name: 'Verde', color: '#22c55e', image: '/green-mana.png' },
 ];
 
 const BACKGROUND_IMAGES = [
@@ -35,6 +36,23 @@ const COUNTER_TYPES = [
   { id: 'energy', name: 'Energía', icon: '⚡' },
   { id: 'commander', name: 'Comandante', icon: '⚔️' },
   { id: 'experience', name: 'Experiencia', icon: '⭐' },
+  { id: 'plusone', name: '+1/+1', icon: '➕' },
+  { id: 'minusone', name: '-1/-1', icon: '➖' },
+  { id: 'loyalty', name: 'Lealtad', icon: '💎' },
+  { id: 'charge', name: 'Carga', icon: '🔋' },
+  { id: 'time', name: 'Tiempo', icon: '⏱️' },
+  { id: 'lore', name: 'Saber', icon: '📖' },
+  { id: 'shield', name: 'Escudo', icon: '🛡️' },
+  { id: 'stun', name: 'Aturdimiento', icon: '💫' },
+  { id: 'treasure', name: 'Tesoro', icon: '💰' },
+  { id: 'food', name: 'Comida', icon: '🍎' },
+  { id: 'clue', name: 'Pista', icon: '🔍' },
+  { id: 'white', name: 'Maná Blanco', icon: '⚪' },
+  { id: 'blue', name: 'Maná Azul', icon: '🔵' },
+  { id: 'black', name: 'Maná Negro', icon: '⚫' },
+  { id: 'red', name: 'Maná Rojo', icon: '🔴' },
+  { id: 'green', name: 'Maná Verde', icon: '🟢' },
+  { id: 'colorless', name: 'Maná Incoloro', icon: '⬜' },
 ];
 
 // Mapeo de nombres a IDs del leaderboard
@@ -60,14 +78,19 @@ function Lifecounter() {
   const [newRoundNumber, setNewRoundNumber] = useState(1);
   const [firstPlayer, setFirstPlayer] = useState(0);
   const [showHighRoll, setShowHighRoll] = useState(false);
+  const [highRollWinner, setHighRollWinner] = useState(null);
+  const [showHighRollResult, setShowHighRollResult] = useState(false);
   const [victoryDetected, setVictoryDetected] = useState(false);
   const [seatAssignment, setSeatAssignment] = useState({}); // {seatIndex: playerName}
   const [assigningPlayer, setAssigningPlayer] = useState(null); // Jugador siendo asignado
   const [showSeatAssignment, setShowSeatAssignment] = useState(false);
   const [deviceOrientation, setDeviceOrientation] = useState('portrait'); // 'portrait' o 'landscape'
+  const [menuButtonShowsLogo, setMenuButtonShowsLogo] = useState(false); // Alternar entre ☰ y logo
 
   const longPressTimer = useRef(null);
   const longPressInterval = useRef(null);
+  const menuButtonLongPress = useRef(null);
+  const menuButtonLongPressTriggered = useRef(false);
 
   const initializePlayers = (count, life) => {
     const newPlayers = [];
@@ -129,6 +152,22 @@ function Lifecounter() {
     return false;
   };
 
+  // Determinar si un jugador está a la izquierda (para modo portrait)
+  const isLeftPlayer = (playerId) => {
+    if (gameMode === '1v1') return playerId === 0;
+    if (gameMode === '2v2' || gameMode === 'Commander') return playerId === 0 || playerId === 2;
+    if (gameMode === 'Three-way') return playerId === 0 || playerId === 1;
+    return false;
+  };
+
+  // Determinar si un jugador está a la derecha (para modo portrait)
+  const isRightPlayer = (playerId) => {
+    if (gameMode === '1v1') return playerId === 1;
+    if (gameMode === '2v2' || gameMode === 'Commander') return playerId === 1 || playerId === 3;
+    if (gameMode === 'Three-way') return playerId === 2;
+    return false;
+  };
+
   const startGame = () => {
     setShowHighRoll(true);
   };
@@ -136,11 +175,19 @@ function Lifecounter() {
   const performHighRoll = () => {
     // High roll aleatorio
     const randomPlayer = Math.floor(Math.random() * playerCount);
-    setFirstPlayer(randomPlayer);
-    setCurrentTurn(randomPlayer);
-    setTurnNumber(1);
-    setShowHighRoll(false);
-    setScreen('game');
+    setHighRollWinner(randomPlayer);
+    setShowHighRollResult(true);
+
+    // Después de 2.5 segundos, iniciar el juego
+    setTimeout(() => {
+      setFirstPlayer(randomPlayer);
+      setCurrentTurn(randomPlayer);
+      setTurnNumber(1);
+      setShowHighRoll(false);
+      setShowHighRollResult(false);
+      setHighRollWinner(null);
+      setScreen('game');
+    }, 2500);
   };
 
   const updatePlayer = (playerId, updates) => {
@@ -180,8 +227,53 @@ function Lifecounter() {
     }
   };
 
+  const startMenuButtonLongPress = () => {
+    menuButtonLongPressTriggered.current = false;
+    menuButtonLongPress.current = setTimeout(() => {
+      setMenuButtonShowsLogo(!menuButtonShowsLogo);
+      menuButtonLongPressTriggered.current = true;
+    }, 800);
+  };
+
+  const endMenuButtonLongPress = () => {
+    if (menuButtonLongPress.current) {
+      clearTimeout(menuButtonLongPress.current);
+      menuButtonLongPress.current = null;
+    }
+  };
+
+  const handleMenuButtonClick = () => {
+    // Solo abrir menú si NO se activó el long press
+    if (!menuButtonLongPressTriggered.current) {
+      setShowMenu(true);
+    }
+    menuButtonLongPressTriggered.current = false;
+  };
+
   const nextTurn = () => {
-    const nextPlayer = (currentTurn + 1) % playerCount;
+    // Rotación horaria según el modo de juego
+    let nextPlayer;
+
+    if (gameMode === '1v1') {
+      // 1v1: 0 → 1 → 0
+      nextPlayer = (currentTurn + 1) % playerCount;
+    } else if (gameMode === 'Three-way') {
+      // Three-way: 0 (arriba) → 2 (abajo-der) → 1 (abajo-izq) → 0
+      const clockwiseOrder = [0, 2, 1];
+      const currentIndex = clockwiseOrder.indexOf(currentTurn);
+      const nextIndex = (currentIndex + 1) % clockwiseOrder.length;
+      nextPlayer = clockwiseOrder[nextIndex];
+    } else if (gameMode === '2v2' || gameMode === 'Commander') {
+      // 2v2 y Commander (grid 2x2): 0 (top-left) → 1 (top-right) → 3 (bottom-right) → 2 (bottom-left) → 0
+      const clockwiseOrder = [0, 1, 3, 2];
+      const currentIndex = clockwiseOrder.indexOf(currentTurn);
+      const nextIndex = (currentIndex + 1) % clockwiseOrder.length;
+      nextPlayer = clockwiseOrder[nextIndex];
+    } else {
+      // Fallback
+      nextPlayer = (currentTurn + 1) % playerCount;
+    }
+
     const isNewRound = nextPlayer === firstPlayer;
 
     setCurrentTurn(nextPlayer);
@@ -197,12 +289,24 @@ function Lifecounter() {
     }
   };
 
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error('Error al activar fullscreen:', err);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+    setShowMenu(false);
+  };
+
   const resetGame = () => {
     if (confirm('¿Estás seguro de que quieres reiniciar la partida?')) {
       initializePlayers(playerCount, startingLife);
       setCurrentTurn(0);
       setTurnNumber(1);
       setShowMenu(false);
+      localStorage.removeItem('lifecounter_session');
     }
   };
 
@@ -270,6 +374,8 @@ function Lifecounter() {
       `${i + 1}° ${p.name}: ${pointsSystem[i] || 0} puntos`
     ).join('\n')}`);
 
+    // Limpiar sesión guardada
+    localStorage.removeItem('lifecounter_session');
     setScreen('welcome');
   };
 
@@ -280,13 +386,70 @@ function Lifecounter() {
     }
   }, [players, screen, victoryDetected]);
 
+  // Guardar sesión en localStorage cuando cambie el estado
+  useEffect(() => {
+    if (screen === 'game' && players.length > 0) {
+      const gameState = {
+        screen,
+        gameMode,
+        playerCount,
+        startingLife,
+        players,
+        currentTurn,
+        turnNumber,
+        firstPlayer,
+        deviceOrientation,
+        seatAssignment,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('lifecounter_session', JSON.stringify(gameState));
+    }
+  }, [screen, gameMode, playerCount, startingLife, players, currentTurn, turnNumber, firstPlayer, deviceOrientation, seatAssignment]);
+
+  // Cargar sesión guardada al montar el componente
+  useEffect(() => {
+    const savedSession = localStorage.getItem('lifecounter_session');
+    if (savedSession) {
+      try {
+        const gameState = JSON.parse(savedSession);
+        // Solo cargar si la sesión no es muy antigua (menos de 24 horas)
+        const hoursSinceLastSave = (Date.now() - gameState.timestamp) / (1000 * 60 * 60);
+        if (hoursSinceLastSave < 24) {
+          // Preguntar al usuario si quiere continuar
+          if (confirm('¿Deseas continuar la partida guardada?')) {
+            setScreen(gameState.screen);
+            setGameMode(gameState.gameMode);
+            setPlayerCount(gameState.playerCount);
+            setStartingLife(gameState.startingLife);
+            setPlayers(gameState.players);
+            setCurrentTurn(gameState.currentTurn);
+            setTurnNumber(gameState.turnNumber);
+            setFirstPlayer(gameState.firstPlayer);
+            setDeviceOrientation(gameState.deviceOrientation);
+            setSeatAssignment(gameState.seatAssignment);
+          } else {
+            localStorage.removeItem('lifecounter_session');
+          }
+        } else {
+          localStorage.removeItem('lifecounter_session');
+        }
+      } catch (error) {
+        console.error('Error al cargar sesión guardada:', error);
+        localStorage.removeItem('lifecounter_session');
+      }
+    }
+  }, []);
+
   return (
     <div className="lifecounter-app">
+      <NavMenu show={screen !== 'game'} />
+
       {/* Pantalla de Bienvenida */}
       {screen === 'welcome' && (
         <div className="lc-screen lc-welcome">
           <div className="lc-welcome-content">
-            <h1 className="lc-logo">⚡ MTG Lifecounter</h1>
+            <img src="/logo-lifecounter.png" alt="MTG Lifecounter" className="lc-logo-image" />
+            <h1 className="lc-logo">MTG Lifecounter</h1>
             <p className="lc-subtitle">Rastreador de vidas para Magic: The Gathering</p>
             <button className="lc-btn lc-btn-primary lc-btn-large" onClick={() => setScreen('mode')}>
               Jugar
@@ -388,7 +551,6 @@ function Lifecounter() {
                       <div
                         key={mana.symbol}
                         className={`lc-mana-option ${player.manaColors.includes(mana.symbol) ? 'selected' : ''}`}
-                        style={{ backgroundColor: mana.color, color: mana.symbol === 'W' ? '#000' : '#fff' }}
                         onClick={() => {
                           const manaColors = player.manaColors.includes(mana.symbol)
                             ? player.manaColors.filter(m => m !== mana.symbol)
@@ -396,7 +558,7 @@ function Lifecounter() {
                           updatePlayer(player.id, { manaColors });
                         }}
                       >
-                        {mana.symbol}
+                        <img src={mana.image} alt={mana.name} className="lc-mana-image" />
                       </div>
                     ))}
                   </div>
@@ -439,10 +601,10 @@ function Lifecounter() {
             {players.map(player => (
               <div
                 key={player.id}
-                className={`lc-player-panel ${currentTurn === player.id ? 'active-turn' : ''} ${player.life === 0 ? 'defeated' : ''} ${isTopPlayer(player.id) ? 'top-player' : ''}`}
+                className={`lc-player-panel ${currentTurn === player.id ? 'active-turn' : ''} ${player.life === 0 ? 'defeated' : ''} ${isTopPlayer(player.id) ? 'top-player' : ''} ${isLeftPlayer(player.id) ? 'left-player' : ''} ${isRightPlayer(player.id) ? 'right-player' : ''}`}
                 style={{
                   backgroundColor: player.color,
-                  backgroundImage: player.backgroundImage ? `url(${player.backgroundImage})` : 'none'
+                  '--bg-image': player.backgroundImage ? `url(${player.backgroundImage})` : 'none'
                 }}
               >
                 {/* Sección de información del jugador */}
@@ -454,15 +616,14 @@ function Lifecounter() {
                     <div className="lc-mana-display">
                       {player.manaColors.map(symbol => {
                         const mana = MANA_COLORS.find(m => m.symbol === symbol);
-                        return (
-                          <div
+                        return mana ? (
+                          <img
                             key={symbol}
-                            className="lc-mana-symbol"
-                            style={{ backgroundColor: mana.color, color: symbol === 'W' ? '#000' : '#fff' }}
-                          >
-                            {symbol}
-                          </div>
-                        );
+                            src={mana.image}
+                            alt={mana.name}
+                            className="lc-mana-symbol-img"
+                          />
+                        ) : null;
                       })}
                     </div>
                   )}
@@ -524,9 +685,22 @@ function Lifecounter() {
               </div>
             ))}
 
-            {/* Botón de menú central */}
-            <button className="lc-btn-menu-center" onClick={() => setShowMenu(true)}>
-              ☰
+            {/* Botón de menú central - Alterna entre ☰ y logo */}
+            <button
+              className="lc-btn-menu-center"
+              onClick={handleMenuButtonClick}
+              onMouseDown={startMenuButtonLongPress}
+              onMouseUp={endMenuButtonLongPress}
+              onMouseLeave={endMenuButtonLongPress}
+              onTouchStart={startMenuButtonLongPress}
+              onTouchEnd={endMenuButtonLongPress}
+              title="Click: abrir menú | Long press: cambiar icono"
+            >
+              {menuButtonShowsLogo ? (
+                <img src="/logo-lifecounter-negro.png" alt="Menu" className="lc-menu-logo" />
+              ) : (
+                '☰'
+              )}
             </button>
           </div>
 
@@ -570,6 +744,9 @@ function Lifecounter() {
             </button>
             <button className="lc-btn lc-btn-block" onClick={() => setShowMenu(false)}>
               Continuar
+            </button>
+            <button className="lc-btn lc-btn-secondary lc-btn-block" onClick={toggleFullscreen}>
+              ⛶ Pantalla Completa
             </button>
             <button className="lc-btn lc-btn-secondary lc-btn-block" onClick={resetGame}>
               Reiniciar Partida
@@ -729,17 +906,29 @@ function Lifecounter() {
       {showHighRoll && (
         <div className="lc-modal">
           <div className="lc-modal-content lc-highroll-modal">
-            <h3>🎲 High Roll</h3>
-            <p className="lc-highroll-text">Determinar jugador inicial</p>
-            <div className="lc-dice-animation">
-              <div className="lc-dice">🎲</div>
-            </div>
-            <button
-              className="lc-btn lc-btn-primary lc-btn-large"
-              onClick={performHighRoll}
-            >
-              Lanzar Dados
-            </button>
+            {!showHighRollResult ? (
+              <>
+                <h3>🎲 High Roll</h3>
+                <p className="lc-highroll-text">Determinar jugador inicial</p>
+                <div className="lc-dice-animation">
+                  <div className="lc-dice">🎲</div>
+                </div>
+                <button
+                  className="lc-btn lc-btn-primary lc-btn-large"
+                  onClick={performHighRoll}
+                >
+                  Lanzar Dados
+                </button>
+              </>
+            ) : (
+              <>
+                <h3>🎲 Ganador del High Roll</h3>
+                <div className="lc-highroll-winner-animation">
+                  <div className="lc-winner-name">{players[highRollWinner]?.name}</div>
+                  <p className="lc-winner-subtitle">empieza la partida</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

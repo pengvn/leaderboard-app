@@ -24,9 +24,11 @@ function App() {
           fontSize: '0.8rem',
           marginTop: 'auto'
         }}>
-          <Link to="/admin" style={{ color: 'inherit', textDecoration: 'none' }}>Admin</Link>
+          <Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>Leaderboard</Link>
           {' | '}
           <Link to="/lifecounter" style={{ color: 'inherit', textDecoration: 'none' }}>Lifecounter</Link>
+          {' | '}
+          <Link to="/admin" style={{ color: 'inherit', textDecoration: 'none' }}>Admin</Link>
         </footer>
       </Router>
     </LeaderboardProvider>
