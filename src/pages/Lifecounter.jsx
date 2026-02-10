@@ -50,8 +50,11 @@ function Lifecounter() {
   const [newRoundNumber, setNewRoundNumber] = useState(1);
   const [firstPlayer, setFirstPlayer] = useState(0);
   const [showHighRoll, setShowHighRoll] = useState(false);
-  const [layoutOrientation, setLayoutOrientation] = useState('horizontal'); // 'horizontal' o 'vertical'
+  const [contentOrientation, setContentOrientation] = useState('horizontal'); // 'horizontal' o 'vertical'
   const [victoryDetected, setVictoryDetected] = useState(false);
+  const [seatAssignment, setSeatAssignment] = useState({}); // {seatIndex: playerName}
+  const [assigningPlayer, setAssigningPlayer] = useState(null); // Jugador siendo asignado
+  const [showSeatAssignment, setShowSeatAssignment] = useState(false);
 
   const longPressTimer = useRef(null);
   const longPressInterval = useRef(null);
@@ -79,22 +82,40 @@ function Lifecounter() {
     setPlayerCount(count);
     setStartingLife(life);
     initializePlayers(count, life);
-    setScreen('setup');
+    setSeatAssignment({});
+    setShowSeatAssignment(true);
+  };
+
+  const assignPlayerToSeat = (seatIndex) => {
+    if (!assigningPlayer) return;
+
+    // Asignar jugador al asiento
+    const newAssignment = { ...seatAssignment, [seatIndex]: assigningPlayer };
+    setSeatAssignment(newAssignment);
+    setAssigningPlayer(null);
+
+    // Si todos los asientos están ocupados, pasar a configuración
+    if (Object.keys(newAssignment).length === playerCount) {
+      // Reordenar jugadores según asientos
+      const reorderedPlayers = [];
+      for (let i = 0; i < playerCount; i++) {
+        const playerName = newAssignment[i];
+        const player = players.find(p => p.name === playerName);
+        if (player) {
+          reorderedPlayers.push({ ...player, id: i, position: i });
+        }
+      }
+      setPlayers(reorderedPlayers);
+      setShowSeatAssignment(false);
+      setScreen('setup');
+    }
   };
 
   // Determinar si un jugador está en la parte superior del tablero
   const isTopPlayer = (playerId) => {
-    if (layoutOrientation === 'vertical') {
-      // En layout vertical, solo los primeros jugadores están invertidos
-      if (gameMode === '1v1') return playerId === 0;
-      if (gameMode === '2v2' || gameMode === 'Commander') return playerId < 2;
-      if (gameMode === 'Three-way') return playerId === 0;
-    } else {
-      // En layout horizontal
-      if (gameMode === '1v1') return playerId === 0;
-      if (gameMode === '2v2' || gameMode === 'Commander') return playerId < 2;
-      if (gameMode === 'Three-way') return playerId === 0;
-    }
+    if (gameMode === '1v1') return playerId === 0;
+    if (gameMode === '2v2' || gameMode === 'Commander') return playerId < 2;
+    if (gameMode === 'Three-way') return playerId === 0;
     return false;
   };
 
@@ -102,9 +123,11 @@ function Lifecounter() {
     setShowHighRoll(true);
   };
 
-  const startGameWithFirstPlayer = (playerIndex) => {
-    setFirstPlayer(playerIndex);
-    setCurrentTurn(playerIndex);
+  const performHighRoll = () => {
+    // High roll aleatorio
+    const randomPlayer = Math.floor(Math.random() * playerCount);
+    setFirstPlayer(randomPlayer);
+    setCurrentTurn(randomPlayer);
     setTurnNumber(1);
     setShowHighRoll(false);
     setScreen('game');
@@ -228,17 +251,18 @@ function Lifecounter() {
             <h2>Modo de Juego</h2>
           </div>
 
-          {/* Selector de Orientación */}
+          {/* Selector de Orientación de Contenido */}
           <div className="lc-orientation-selector">
+            <p className="lc-orientation-label">Orientación del contenido:</p>
             <button
-              className={`lc-orientation-btn ${layoutOrientation === 'horizontal' ? 'active' : ''}`}
-              onClick={() => setLayoutOrientation('horizontal')}
+              className={`lc-orientation-btn ${contentOrientation === 'horizontal' ? 'active' : ''}`}
+              onClick={() => setContentOrientation('horizontal')}
             >
               ⬌ Horizontal
             </button>
             <button
-              className={`lc-orientation-btn ${layoutOrientation === 'vertical' ? 'active' : ''}`}
-              onClick={() => setLayoutOrientation('vertical')}
+              className={`lc-orientation-btn ${contentOrientation === 'vertical' ? 'active' : ''}`}
+              onClick={() => setContentOrientation('vertical')}
             >
               ⬍ Vertical
             </button>
@@ -359,11 +383,11 @@ function Lifecounter() {
       {/* Tablero de Juego */}
       {screen === 'game' && (
         <div className="lc-screen lc-game-screen">
-          <div className={`lc-game-board lc-mode-${gameMode.toLowerCase().replace(/[^a-z0-9]/g, '')} lc-layout-${layoutOrientation}`}>
+          <div className={`lc-game-board lc-mode-${gameMode.toLowerCase().replace(/[^a-z0-9]/g, '')}`}>
             {players.map(player => (
               <div
                 key={player.id}
-                className={`lc-player-panel ${currentTurn === player.id ? 'active-turn' : ''} ${player.life === 0 ? 'defeated' : ''} ${isTopPlayer(player.id) ? 'top-player' : ''}`}
+                className={`lc-player-panel lc-content-${contentOrientation} ${currentTurn === player.id ? 'active-turn' : ''} ${player.life === 0 ? 'defeated' : ''} ${isTopPlayer(player.id) ? 'top-player' : ''}`}
                 style={{
                   backgroundColor: player.color,
                   backgroundImage: player.backgroundImage ? `url(${player.backgroundImage})` : 'none'
@@ -572,25 +596,76 @@ function Lifecounter() {
         </div>
       )}
 
+      {/* Asignación de Asientos */}
+      {showSeatAssignment && (
+        <div className="lc-modal">
+          <div className="lc-modal-content lc-seat-assignment-modal">
+            <h3>Asignación de Asientos</h3>
+            <p className="lc-assignment-text">
+              {assigningPlayer
+                ? `${assigningPlayer}: Toca el asiento donde te vas a sentar`
+                : 'Selecciona un jugador para asignar su asiento'}
+            </p>
+
+            {/* Lista de jugadores disponibles */}
+            {!assigningPlayer && (
+              <div className="lc-available-players">
+                {players.filter(p => !Object.values(seatAssignment).includes(p.name)).map(player => (
+                  <button
+                    key={player.id}
+                    className="lc-player-select-btn"
+                    style={{ borderColor: player.color }}
+                    onClick={() => setAssigningPlayer(player.name)}
+                  >
+                    {player.name}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Tablero de asientos */}
+            <div className={`lc-seat-grid lc-mode-${gameMode.toLowerCase().replace(/[^a-z0-9]/g, '')}`}>
+              {Array.from({ length: playerCount }).map((_, index) => (
+                <div
+                  key={index}
+                  className={`lc-seat-slot ${seatAssignment[index] ? 'occupied' : ''} ${assigningPlayer ? 'selectable' : ''}`}
+                  onClick={() => assigningPlayer && assignPlayerToSeat(index)}
+                >
+                  <div className="lc-seat-number">Asiento {index + 1}</div>
+                  {seatAssignment[index] && (
+                    <div className="lc-seat-player">{seatAssignment[index]}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {assigningPlayer && (
+              <button
+                className="lc-btn lc-btn-secondary lc-btn-block"
+                onClick={() => setAssigningPlayer(null)}
+              >
+                Cancelar
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* High Roll Modal */}
       {showHighRoll && (
         <div className="lc-modal">
           <div className="lc-modal-content lc-highroll-modal">
             <h3>🎲 High Roll</h3>
-            <p className="lc-highroll-text">Selecciona quién comienza la partida</p>
-            <div className="lc-highroll-players">
-              {players.map(player => (
-                <button
-                  key={player.id}
-                  className="lc-highroll-btn"
-                  style={{ borderColor: player.color }}
-                  onClick={() => startGameWithFirstPlayer(player.id)}
-                >
-                  <div className="lc-highroll-player-name">{player.name}</div>
-                  {player.deck && <div className="lc-highroll-deck">{player.deck}</div>}
-                </button>
-              ))}
+            <p className="lc-highroll-text">Determinar jugador inicial</p>
+            <div className="lc-dice-animation">
+              <div className="lc-dice">🎲</div>
             </div>
+            <button
+              className="lc-btn lc-btn-primary lc-btn-large"
+              onClick={performHighRoll}
+            >
+              Lanzar Dados
+            </button>
           </div>
         </div>
       )}
