@@ -235,7 +235,7 @@ function Lifecounter() {
       players: players.map(p => ({
         id: PLAYER_ID_MAP[p.name] || p.name.toLowerCase(), // 'id' no 'userId'
         deck: p.deck || 'Sin nombre', // 'deck' no 'deckName'
-        colors: p.manaColors || [], // 'colors' no 'deckColors'
+        colors: Array.isArray(p.manaColors) ? p.manaColors : [], // Asegurar que sea array
         life: p.life
       }))
     };

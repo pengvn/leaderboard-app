@@ -33,9 +33,11 @@ const MatchHistory = ({ matches, users }) => {
                                                 </span>
                                                 <div className="deck-info">
                                                     <span>{p.deck}</span>
-                                                    <span className="colors">
-                                                        {p.colors.map(c => <span key={c} className={`dot dot-${c}`} />)}
-                                                    </span>
+                                                    {p.colors && p.colors.length > 0 && (
+                                                        <span className="colors">
+                                                            {p.colors.map(c => <span key={c} className={`dot dot-${c}`} />)}
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 <span className="score-val">{p.life} HP</span>
                                             </div>
