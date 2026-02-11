@@ -84,7 +84,6 @@ function Lifecounter() {
   const [seatAssignment, setSeatAssignment] = useState({}); // {seatIndex: playerName}
   const [assigningPlayer, setAssigningPlayer] = useState(null); // Jugador siendo asignado
   const [showSeatAssignment, setShowSeatAssignment] = useState(false);
-  const [deviceOrientation, setDeviceOrientation] = useState('portrait'); // 'portrait' o 'landscape'
   const [menuButtonShowsLogo, setMenuButtonShowsLogo] = useState(false); // Alternar entre ☰ y logo
 
   const longPressTimer = useRef(null);
@@ -398,13 +397,12 @@ function Lifecounter() {
         currentTurn,
         turnNumber,
         firstPlayer,
-        deviceOrientation,
         seatAssignment,
         timestamp: Date.now()
       };
       localStorage.setItem('lifecounter_session', JSON.stringify(gameState));
     }
-  }, [screen, gameMode, playerCount, startingLife, players, currentTurn, turnNumber, firstPlayer, deviceOrientation, seatAssignment]);
+  }, [screen, gameMode, playerCount, startingLife, players, currentTurn, turnNumber, firstPlayer, seatAssignment]);
 
   // Cargar sesión guardada al montar el componente
   useEffect(() => {
@@ -425,7 +423,6 @@ function Lifecounter() {
             setCurrentTurn(gameState.currentTurn);
             setTurnNumber(gameState.turnNumber);
             setFirstPlayer(gameState.firstPlayer);
-            setDeviceOrientation(gameState.deviceOrientation);
             setSeatAssignment(gameState.seatAssignment);
           } else {
             localStorage.removeItem('lifecounter_session');
@@ -464,23 +461,6 @@ function Lifecounter() {
           <div className="lc-screen-header">
             <button className="lc-btn lc-btn-back" onClick={() => setScreen('welcome')}>← Atrás</button>
             <h2>Modo de Juego</h2>
-          </div>
-
-          {/* Selector de Orientación del Dispositivo */}
-          <div className="lc-orientation-selector">
-            <p className="lc-orientation-label">Orientación del dispositivo:</p>
-            <button
-              className={`lc-orientation-btn ${deviceOrientation === 'portrait' ? 'active' : ''}`}
-              onClick={() => setDeviceOrientation('portrait')}
-            >
-              📱 Vertical
-            </button>
-            <button
-              className={`lc-orientation-btn ${deviceOrientation === 'landscape' ? 'active' : ''}`}
-              onClick={() => setDeviceOrientation('landscape')}
-            >
-              📱 Horizontal
-            </button>
           </div>
 
           <div className="lc-game-modes">
@@ -597,7 +577,7 @@ function Lifecounter() {
       {/* Tablero de Juego */}
       {screen === 'game' && (
         <div className="lc-screen lc-game-screen">
-          <div className={`lc-game-board lc-mode-${gameMode.toLowerCase().replace(/[^a-z0-9]/g, '')} lc-orientation-${deviceOrientation}`}>
+          <div className={`lc-game-board lc-mode-${gameMode.toLowerCase().replace(/[^a-z0-9]/g, '')} lc-orientation-landscape`}>
             {players.map(player => (
               <div
                 key={player.id}
@@ -720,24 +700,8 @@ function Lifecounter() {
             <div className="lc-menu-info">
               <p>Ronda: <strong>{turnNumber}</strong></p>
               <p>Turno actual: <strong>{players[currentTurn]?.name}</strong></p>
-              <p>Orientación: <strong>{deviceOrientation === 'portrait' ? 'Vertical' : 'Horizontal'}</strong></p>
             </div>
 
-            {/* Cambiar orientación durante la partida */}
-            <div className="lc-orientation-toggle">
-              <button
-                className={`lc-orientation-toggle-btn ${deviceOrientation === 'portrait' ? 'active' : ''}`}
-                onClick={() => setDeviceOrientation('portrait')}
-              >
-                📱 Vertical
-              </button>
-              <button
-                className={`lc-orientation-toggle-btn ${deviceOrientation === 'landscape' ? 'active' : ''}`}
-                onClick={() => setDeviceOrientation('landscape')}
-              >
-                📱 Horizontal
-              </button>
-            </div>
 
             <button className="lc-btn lc-btn-primary lc-btn-block" onClick={() => { nextTurn(); setShowMenu(false); }}>
               ▶ Siguiente Turno

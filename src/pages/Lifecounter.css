@@ -139,45 +139,6 @@
   margin: 0;
 }
 
-/* Selector de Orientación */
-.lc-orientation-selector {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem 2rem;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.lc-orientation-label {
-  color: #a0a0b0;
-  font-size: 0.95rem;
-  margin: 0;
-}
-
-.lc-orientation-btn {
-  padding: 0.75rem 1.5rem;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #a0a0b0;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-
-.lc-orientation-btn.active {
-  background: #6366f1;
-  color: white;
-  border-color: #6366f1;
-}
-
-.lc-orientation-btn:active {
-  transform: scale(0.95);
-}
-
 /* Game Mode Screen */
 .lc-mode-screen {
   overflow-y: auto;
@@ -419,153 +380,41 @@
    ======================================== */
 
 /* LANDSCAPE - Selector manual */
-.lc-game-board.lc-orientation-landscape .lc-player-panel {
-  flex-direction: column !important;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem 2rem;
-}
 
-.lc-game-board.lc-orientation-landscape .lc-player-info-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
-  margin-bottom: 0.5rem;
-}
 
-.lc-game-board.lc-orientation-landscape .lc-life-counter {
-  flex-direction: row;
-  gap: 2rem;
-  justify-content: center;
-  align-items: center;
-}
 
 /* Asegurar orden correcto: - a la izquierda, + a la derecha */
-.lc-game-board.lc-orientation-landscape .lc-life-btn:first-child {
-  order: 1; /* botón - */
-}
 
-.lc-game-board.lc-orientation-landscape .lc-life-value {
-  order: 2;
-}
 
-.lc-game-board.lc-orientation-landscape .lc-life-btn:last-child {
-  order: 3; /* botón + */
-}
 
-.lc-game-board.lc-orientation-landscape .lc-life-btn {
-  width: 70px;
-  height: 70px;
-}
 
-.lc-game-board.lc-orientation-landscape .lc-life-value {
-  font-size: 5rem;
-  min-width: 150px;
-}
 
-.lc-game-board.lc-orientation-landscape .lc-player-name {
-  font-size: 1.1rem;
-  margin-bottom: 0.25rem;
-}
 
-.lc-game-board.lc-orientation-landscape .lc-player-deck {
-  font-size: 0.8rem;
-  margin-bottom: 0.5rem;
-}
 
-.lc-game-board.lc-orientation-landscape .lc-mana-symbol,
-.lc-game-board.lc-orientation-landscape .lc-mana-symbol-img {
-  width: 26px;
-  height: 26px;
-  font-size: 0.8rem;
-}
 
 /* Jugadores superiores en landscape */
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-life-value {
-  transform: rotate(180deg);
-}
 
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-life-btn {
-  transform: rotate(180deg);
-}
 
 /* Box de ronda para jugadores superiores: arriba-izquierda */
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-turn-indicator {
-  top: 1rem;
-  left: 1rem;
-  bottom: auto;
-  right: auto;
-}
 
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
-  transform: rotate(180deg);
-}
 
 /* PORTRAIT - Selector manual */
-.lc-game-board.lc-orientation-portrait .lc-player-panel {
-  flex-direction: column !important;
-  justify-content: center;
-  align-items: center;
-}
 
-.lc-game-board.lc-orientation-portrait .lc-player-info-section {
-  width: 100%;
-  align-items: center;
-}
 
-.lc-game-board.lc-orientation-portrait .lc-life-counter {
-  flex-direction: row;
-}
 
 /* Asegurar orden correcto en portrait: - izquierda, + derecha */
-.lc-game-board.lc-orientation-portrait .lc-life-btn:first-child {
-  order: 1; /* botón - */
-}
 
-.lc-game-board.lc-orientation-portrait .lc-life-value {
-  order: 2;
-}
 
-.lc-game-board.lc-orientation-portrait .lc-life-btn:last-child {
-  order: 3; /* botón + */
-}
 
 /* Jugadores LEFT en portrait - Rotar 90° */
-.lc-game-board.lc-orientation-portrait .lc-player-panel.left-player .lc-life-value,
-.lc-game-board.lc-orientation-portrait .lc-player-panel.left-player .lc-life-btn {
-  transform: rotate(90deg);
-}
 
 /* Jugadores RIGHT en portrait - Rotar -90° */
-.lc-game-board.lc-orientation-portrait .lc-player-panel.right-player .lc-life-value,
-.lc-game-board.lc-orientation-portrait .lc-player-panel.right-player .lc-life-btn {
-  transform: rotate(-90deg);
-}
 
 /* Box de ronda en portrait - LEFT player */
-.lc-game-board.lc-orientation-portrait .lc-player-panel.left-player .lc-turn-indicator {
-  top: auto;
-  left: 1rem;
-  bottom: 1rem;
-  right: auto;
-}
 
-.lc-game-board.lc-orientation-portrait .lc-player-panel.left-player .lc-turn-indicator .lc-turn-info {
-  transform: rotate(90deg);
-}
 
 /* Box de ronda en portrait - RIGHT player */
-.lc-game-board.lc-orientation-portrait .lc-player-panel.right-player .lc-turn-indicator {
-  top: 1rem;
-  left: auto;
-  bottom: auto;
-  right: 1rem;
-}
 
-.lc-game-board.lc-orientation-portrait .lc-player-panel.right-player .lc-turn-indicator .lc-turn-info {
-  transform: rotate(-90deg);
-}
 
 /* Player Panel */
 .lc-player-panel {
@@ -601,24 +450,57 @@
 }
 
 /* ========================================
+   ROTACIONES POR ORIENTACIÓN DEL DISPOSITIVO
+   ======================================== */
+
+/* LANDSCAPE (horizontal) - Diseño por defecto */
+/* Jugadores TOP (arriba) ven el contenido rotado 180° */
+
+/* Rotar background de jugadores superiores */
+.lc-player-panel.top-player::before {
+  transform: rotate(180deg);
+}
+
+/* Rotar contenido de jugadores superiores 180° */
+.lc-player-panel.top-player .lc-life-value,
+.lc-player-panel.top-player .lc-life-btn {
+  transform: rotate(180deg);
+}
+
+.lc-player-panel.top-player .lc-counters-display,
+.lc-player-panel.top-player .lc-mana-display,
+.lc-player-panel.top-player .lc-player-deck,
+.lc-player-panel.top-player .lc-player-name {
+  transform: rotate(180deg);
+}
+
+.lc-player-panel.top-player .lc-counter-item {
+  transform: rotate(180deg);
+}
+
+/* Box de ronda para jugadores superiores: arriba-izquierda */
+.lc-player-panel.top-player .lc-turn-indicator {
+  top: 1rem;
+  left: 1rem;
+  bottom: auto;
+  right: auto;
+}
+
+.lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
+  transform: rotate(180deg);
+}
+
+
+/* ========================================
    ROTACIONES POR ORIENTACIÓN
    ======================================== */
 
 /* LANDSCAPE: Rotar jugadores superiores 180° (background + contenido) */
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player::before {
-  transform: rotate(180deg);
-}
 
 /* PORTRAIT: Rotar backgrounds según posición del jugador */
 /* Jugadores LEFT miran hacia la derecha → (90°) */
-.lc-game-board.lc-orientation-portrait .lc-player-panel.left-player::before {
-  transform: rotate(90deg);
-}
 
 /* Jugadores RIGHT miran hacia la izquierda ← (-90°) */
-.lc-game-board.lc-orientation-portrait .lc-player-panel.right-player::before {
-  transform: rotate(-90deg);
-}
 
 .lc-player-panel::after {
   content: '';
@@ -706,12 +588,6 @@
 }
 
 /* SOLO en LANDSCAPE, rotar el contenido de top-player 180° */
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-counters-display,
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-mana-display,
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-player-deck,
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-player-name {
-  transform: rotate(180deg);
-}
 
 .lc-player-panel.active-turn {
   box-shadow:
@@ -846,35 +722,14 @@
 }
 
 /* Rotar contadores individuales en jugadores superiores SOLO en landscape */
-.lc-game-board.lc-orientation-landscape .lc-player-panel.top-player .lc-counter-item {
-  transform: rotate(180deg);
-}
 
 /* PORTRAIT: Rotar contenido según posición del jugador */
 
 /* Jugadores LEFT miran hacia la derecha → - Rotar 90° */
-.lc-game-board.lc-orientation-portrait .lc-player-panel.left-player .lc-counters-display,
-.lc-game-board.lc-orientation-portrait .lc-player-panel.left-player .lc-mana-display,
-.lc-game-board.lc-orientation-portrait .lc-player-panel.left-player .lc-player-deck,
-.lc-game-board.lc-orientation-portrait .lc-player-panel.left-player .lc-player-name {
-  transform: rotate(90deg);
-}
 
-.lc-game-board.lc-orientation-portrait .lc-player-panel.left-player .lc-counter-item {
-  transform: rotate(90deg);
-}
 
 /* Jugadores RIGHT miran hacia la izquierda ← - Rotar -90° */
-.lc-game-board.lc-orientation-portrait .lc-player-panel.right-player .lc-counters-display,
-.lc-game-board.lc-orientation-portrait .lc-player-panel.right-player .lc-mana-display,
-.lc-game-board.lc-orientation-portrait .lc-player-panel.right-player .lc-player-deck,
-.lc-game-board.lc-orientation-portrait .lc-player-panel.right-player .lc-player-name {
-  transform: rotate(-90deg);
-}
 
-.lc-game-board.lc-orientation-portrait .lc-player-panel.right-player .lc-counter-item {
-  transform: rotate(-90deg);
-}
 
 /* Indicador de turno activo - Abajo a la derecha (PEQUEÑO) */
 .lc-turn-indicator {
@@ -1062,40 +917,6 @@
 .lc-menu-info strong {
   color: white;
   font-size: 1.1rem;
-}
-
-/* Toggle de orientación en el menú */
-.lc-orientation-toggle {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.5rem;
-  border-radius: 10px;
-}
-
-.lc-orientation-toggle-btn {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #a0a0b0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-
-.lc-orientation-toggle-btn.active {
-  background: #6366f1;
-  color: white;
-  border-color: #6366f1;
-}
-
-.lc-orientation-toggle-btn:active {
-  transform: scale(0.95);
 }
 
 /* Player Config Modal */
@@ -1688,83 +1509,210 @@
   /* En portrait, los paneles están uno al lado del otro horizontalmente
      y el contenido se rota 90° o -90°, así que necesitamos hacer todo más compacto */
 
-  .lc-game-board.lc-orientation-portrait .lc-player-panel {
+
+  /* Vida más compacta para portrait */
+
+
+
+  /* Texto más pequeño en portrait */
+
+
+  /* Maná y contadores más pequeños */
+
+
+
+
+  /* Turn indicator muy pequeño en portrait */
+
+
+  /* Botón de menú central más pequeño en portrait */
+
+
+}
+
+/* Portrait en pantallas muy pequeñas (móviles) */
+
+/* ========================================
+   RESPONSIVE PORTRAIT ORIENTATION
+   ======================================== */
+
+@media (orientation: portrait) {
+  /* PORTRAIT (vertical) - Cuando el dispositivo se gira vertical */
+  /* Resetear rotaciones de landscape */
+  
+  .lc-player-panel.top-player::before {
+    transform: none;
+  }
+
+  .lc-player-panel.top-player .lc-life-value,
+  .lc-player-panel.top-player .lc-life-btn {
+    transform: none;
+  }
+
+  .lc-player-panel.top-player .lc-counters-display,
+  .lc-player-panel.top-player .lc-mana-display,
+  .lc-player-panel.top-player .lc-player-deck,
+  .lc-player-panel.top-player .lc-player-name {
+    transform: none;
+  }
+
+  .lc-player-panel.top-player .lc-counter-item {
+    transform: none;
+  }
+
+  .lc-player-panel.top-player .lc-turn-indicator {
+    top: auto;
+    left: auto;
+    bottom: 0.5rem;
+    right: 0.5rem;
+  }
+
+  .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
+    transform: none;
+  }
+
+  /* Rotar jugadores LEFT y RIGHT */
+  
+  /* Rotar backgrounds */
+  .lc-player-panel.left-player::before {
+    transform: rotate(90deg);
+  }
+
+  .lc-player-panel.right-player::before {
+    transform: rotate(-90deg);
+  }
+
+  /* Rotar contenido de jugadores LEFT - 90° */
+  .lc-player-panel.left-player .lc-life-value,
+  .lc-player-panel.left-player .lc-life-btn {
+    transform: rotate(90deg);
+  }
+
+  .lc-player-panel.left-player .lc-counters-display,
+  .lc-player-panel.left-player .lc-mana-display,
+  .lc-player-panel.left-player .lc-player-deck,
+  .lc-player-panel.left-player .lc-player-name {
+    transform: rotate(90deg);
+  }
+
+  .lc-player-panel.left-player .lc-counter-item {
+    transform: rotate(90deg);
+  }
+
+  /* Box de ronda para LEFT player */
+  .lc-player-panel.left-player .lc-turn-indicator {
+    top: auto;
+    left: 1rem;
+    bottom: 1rem;
+    right: auto;
+  }
+
+  .lc-player-panel.left-player .lc-turn-indicator .lc-turn-info {
+    transform: rotate(90deg);
+  }
+
+  /* Rotar contenido de jugadores RIGHT - (-90°) */
+  .lc-player-panel.right-player .lc-life-value,
+  .lc-player-panel.right-player .lc-life-btn {
+    transform: rotate(-90deg);
+  }
+
+  .lc-player-panel.right-player .lc-counters-display,
+  .lc-player-panel.right-player .lc-mana-display,
+  .lc-player-panel.right-player .lc-player-deck,
+  .lc-player-panel.right-player .lc-player-name {
+    transform: rotate(-90deg);
+  }
+
+  .lc-player-panel.right-player .lc-counter-item {
+    transform: rotate(-90deg);
+  }
+
+  /* Box de ronda para RIGHT player */
+  .lc-player-panel.right-player .lc-turn-indicator {
+    top: 1rem;
+    left: auto;
+    bottom: auto;
+    right: 1rem;
+  }
+
+  .lc-player-panel.right-player .lc-turn-indicator .lc-turn-info {
+    transform: rotate(-90deg);
+  }
+
+  /* Elementos más compactos en portrait */
+  .lc-player-panel {
     padding: 0.5rem;
     margin: 1px;
   }
 
-  /* Vida más compacta para portrait */
-  .lc-game-board.lc-orientation-portrait .lc-life-value {
+  .lc-life-value {
     font-size: 2.5rem;
     min-width: 80px;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-life-btn {
+  .lc-life-btn {
     width: 45px;
     height: 45px;
     font-size: 1.3rem;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-life-counter {
+  .lc-life-counter {
     gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
 
-  /* Texto más pequeño en portrait */
-  .lc-game-board.lc-orientation-portrait .lc-player-name {
+  .lc-player-name {
     font-size: 0.9rem;
     margin-bottom: 0.3rem;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-player-deck {
+  .lc-player-deck {
     font-size: 0.7rem;
     margin-bottom: 0.5rem;
   }
 
-  /* Maná y contadores más pequeños */
-  .lc-game-board.lc-orientation-portrait .lc-mana-symbol-img {
+  .lc-mana-symbol-img {
     width: 20px;
     height: 20px;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-mana-display {
+  .lc-mana-display {
     gap: 0.2rem;
     margin-bottom: 0.5rem;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-counter-item {
+  .lc-counter-item {
     padding: 0.15rem 0.4rem;
     font-size: 0.7rem;
     gap: 0.2rem;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-counters-display {
+  .lc-counters-display {
     gap: 0.5rem;
   }
 
-  /* Turn indicator muy pequeño en portrait */
-  .lc-game-board.lc-orientation-portrait .lc-turn-indicator {
+  .lc-turn-indicator {
     padding: 0.25rem 0.5rem;
     border-radius: 6px;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-turn-badge {
+  .lc-turn-badge {
     font-size: 0.55rem;
   }
 
-  /* Botón de menú central más pequeño en portrait */
-  .lc-game-board.lc-orientation-portrait .lc-btn-menu-center {
+  .lc-btn-menu-center {
     width: 45px;
     height: 45px;
     font-size: 1rem;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-menu-logo {
+  .lc-menu-logo {
     width: 60px;
     height: 60px;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-btn-menu-center:has(.lc-menu-logo) {
+  .lc-btn-menu-center:has(.lc-menu-logo) {
     width: 60px;
     height: 60px;
   }
@@ -1772,32 +1720,33 @@
 
 /* Portrait en pantallas muy pequeñas (móviles) */
 @media (orientation: portrait) and (max-width: 768px) {
-  .lc-game-board.lc-orientation-portrait .lc-life-value {
+  .lc-life-value {
     font-size: 2rem;
     min-width: 70px;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-life-btn {
+  .lc-life-btn {
     width: 40px;
     height: 40px;
     font-size: 1.2rem;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-player-name {
+  .lc-player-name {
     font-size: 0.8rem;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-player-deck {
+  .lc-player-deck {
     font-size: 0.65rem;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-mana-symbol-img {
+  .lc-mana-symbol-img {
     width: 18px;
     height: 18px;
   }
 
-  .lc-game-board.lc-orientation-portrait .lc-counter-item {
+  .lc-counter-item {
     padding: 0.1rem 0.3rem;
     font-size: 0.65rem;
   }
 }
+
