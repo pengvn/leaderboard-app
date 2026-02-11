@@ -35,16 +35,12 @@
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    /* Or 12px for rounded square */
     object-fit: cover;
     border: 3px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s;
-    /* Smooth zoom transition */
     transform: scale(1.15);
-    /* Zoom effect per user request */
     z-index: 1;
-    /* Ensure below badge/crown if needed */
 }
 
 /* Hover effect for an interactive feel */
@@ -104,20 +100,61 @@
     justify-content: flex-start;
     padding-top: 1.5rem;
     position: relative;
-    /* overflow: hidden; Removed to fix crown clipping */
+    overflow: visible; /* Para que el avatar no se corte */
+    
+    /* Máscara de difuminado */
+    mask-image: linear-gradient(to bottom, 
+        rgba(0, 0, 0, 1) 0%, 
+        rgba(0, 0, 0, 1) 50%, 
+        rgba(0, 0, 0, 0) 95%
+    );
+    -webkit-mask-image: linear-gradient(to bottom, 
+        rgba(0, 0, 0, 1) 0%, 
+        rgba(0, 0, 0, 1) 50%, 
+        rgba(0, 0, 0, 0) 95%
+    );
 }
+
 
 .rank-1 .pedestal {
     height: 220px;
-    box-shadow: 0 -10px 40px rgba(255, 215, 0, 0.1);
+    box-shadow: 0 -10px 40px rgba(158, 158, 158, 0.1);
 }
 
 .rank-2 .pedestal {
-    height: 160px;
+    height: 210px; /* Más bajo que el tercero */
+}
+
+@media (max-width: 768px) {
+  .rank-2 .pedestal {
+    height: 150px; /* Más bajo que el tercero */
+}
+  .rank-1 .pedestal {
+    height: 220px;
+    transform: translatex(-3px);
+    box-shadow: 0 -10px 40px rgba(158, 158, 158, 0.1);
+}
 }
 
 .rank-3 .pedestal {
-    height: 130px;
+    height: 140px; /* Ligeramente más alto que el segundo */
+}
+
+@media (max-width: 768px) {
+  .rank-3 .pedestal {
+    height: 140px; /* Ligeramente más alto que el segundo */
+}
+
+}
+/* O usa transform para más control */
+.podium-container .rank-2 {
+    order: 1;
+    transform: translateY(40px); /* Ajusta según necesites */
+}
+
+.podium-container .rank-3 {
+    order: 3;
+    transform: translateY(25px);
 }
 
 .crown-icon {
@@ -126,7 +163,7 @@
     position: absolute;
     top: -55px;
     /* Moved above the avatar */
-    left: 27%;
+    left: 25%;
     transform: translateX(-50%) rotate(-5deg);
     /* Added slight tilt for style */
     color: #fbbf24;

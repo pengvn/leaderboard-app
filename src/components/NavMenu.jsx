@@ -69,13 +69,14 @@ const NavMenu = ({ show = true }) => {
             <span className="nav-text">Lifecounter</span>
           </button>
 
-          <button
+          <a
+            href="/admin"
             className={`nav-menu-item ${isActive('/admin') ? 'active' : ''}`}
-            onClick={() => navigateTo('/admin')}
+            onClick={() => setIsOpen(false)}
           >
             <span className="nav-icon">⚙️</span>
             <span className="nav-text">Admin</span>
-          </button>
+          </a>
 
           <button
             className="nav-menu-item"
