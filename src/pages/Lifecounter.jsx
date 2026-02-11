@@ -825,16 +825,30 @@ function Lifecounter() {
             {/* Lista de jugadores disponibles */}
             {!assigningPlayer && (
               <div className="lc-available-players">
-                {players.filter(p => !Object.values(seatAssignment).includes(p.name)).map(player => (
-                  <button
-                    key={player.id}
-                    className="lc-player-select-btn"
-                    style={{ borderColor: player.color }}
-                    onClick={() => setAssigningPlayer(player.name)}
-                  >
-                    {player.name}
-                  </button>
-                ))}
+                {/* En 1v1: mostrar los 4 jugadores, elegir 2 */}
+                {gameMode === '1v1' ? (
+                  PREDEFINED_PLAYERS.filter(name => !Object.values(seatAssignment).includes(name)).map(name => (
+                    <button
+                      key={name}
+                      className="lc-player-select-btn"
+                      style={{ borderColor: '#6366f1' }}
+                      onClick={() => setAssigningPlayer(name)}
+                    >
+                      {name}
+                    </button>
+                  ))
+                ) : (
+                  players.filter(p => !Object.values(seatAssignment).includes(p.name)).map(player => (
+                    <button
+                      key={player.id}
+                      className="lc-player-select-btn"
+                      style={{ borderColor: player.color }}
+                      onClick={() => setAssigningPlayer(player.name)}
+                    >
+                      {player.name}
+                    </button>
+                  ))
+                )}
               </div>
             )}
 
