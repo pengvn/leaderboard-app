@@ -250,31 +250,32 @@ function Lifecounter() {
   };
 
   const nextTurn = () => {
-    // Rotación horaria según el modo de juego
-    let nextPlayer;
+    const getNextInRotation = (current) => {
+      if (gameMode === '1v1') {
+        return (current + 1) % playerCount;
+      } else if (gameMode === 'Three-way') {
+        const order = [0, 2, 1];
+        const idx = order.indexOf(current);
+        return order[(idx + 1) % order.length];
+      } else if (gameMode === '2v2' || gameMode === 'Commander') {
+        const order = [0, 1, 3, 2];
+        const idx = order.indexOf(current);
+        return order[(idx + 1) % order.length];
+      }
+      return (current + 1) % playerCount;
+    };
 
-    if (gameMode === '1v1') {
-      // 1v1: 0 → 1 → 0
-      nextPlayer = (currentTurn + 1) % playerCount;
-    } else if (gameMode === 'Three-way') {
-      // Three-way: 0 (arriba) → 2 (abajo-der) → 1 (abajo-izq) → 0
-      const clockwiseOrder = [0, 2, 1];
-      const currentIndex = clockwiseOrder.indexOf(currentTurn);
-      const nextIndex = (currentIndex + 1) % clockwiseOrder.length;
-      nextPlayer = clockwiseOrder[nextIndex];
-    } else if (gameMode === '2v2' || gameMode === 'Commander') {
-      // 2v2 y Commander (grid 2x2): 0 (top-left) → 1 (top-right) → 3 (bottom-right) → 2 (bottom-left) → 0
-      const clockwiseOrder = [0, 1, 3, 2];
-      const currentIndex = clockwiseOrder.indexOf(currentTurn);
-      const nextIndex = (currentIndex + 1) % clockwiseOrder.length;
-      nextPlayer = clockwiseOrder[nextIndex];
-    } else {
-      // Fallback
-      nextPlayer = (currentTurn + 1) % playerCount;
+    // Buscar siguiente jugador vivo (saltar muertos)
+    let nextPlayer = getNextInRotation(currentTurn);
+    let attempts = 0;
+    while (players[nextPlayer]?.life <= 0 && attempts < playerCount) {
+      nextPlayer = getNextInRotation(nextPlayer);
+      attempts++;
     }
 
-    const isNewRound = nextPlayer === firstPlayer;
+    if (attempts >= playerCount) return; // Todos muertos
 
+    const isNewRound = nextPlayer === firstPlayer;
     setCurrentTurn(nextPlayer);
 
     if (isNewRound && turnNumber > 0) {
@@ -379,8 +380,31 @@ function Lifecounter() {
   };
 
   useEffect(() => {
-    const alivePlayers = players.filter(p => p.life > 0);
-    if (screen === 'game' && alivePlayers.length === 1 && !victoryDetected) {
+    if (screen !== 'game') return;
+
+    // Verificar condiciones de derrota
+    const updatedPlayers = players.map(player => {
+      if (player.life <= 0) return player;
+
+      // Comandante >= 21 → derrota
+      if ((player.counters?.commander || 0) >= 21) {
+        return { ...player, life: 0 };
+      }
+
+      // Veneno >= 10 → derrota
+      if ((player.counters?.poison || 0) >= 10) {
+        return { ...player, life: 0 };
+      }
+
+      return player;
+    });
+
+    if (JSON.stringify(updatedPlayers) !== JSON.stringify(players)) {
+      setPlayers(updatedPlayers);
+    }
+
+    const alivePlayers = updatedPlayers.filter(p => p.life > 0);
+    if (alivePlayers.length === 1 && !victoryDetected) {
       setVictoryDetected(true);
     }
   }, [players, screen, victoryDetected]);
