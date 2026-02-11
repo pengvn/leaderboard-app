@@ -84,6 +84,8 @@ function Lifecounter() {
   const [seatAssignment, setSeatAssignment] = useState({}); // {seatIndex: playerName}
   const [assigningPlayer, setAssigningPlayer] = useState(null); // Jugador siendo asignado
   const [showSeatAssignment, setShowSeatAssignment] = useState(false);
+  const [teamSelections, setTeamSelections] = useState({ team1: [], team2: [] }); // Para 2v2
+  const [showTeamSelection, setShowTeamSelection] = useState(false); // Pantalla de selección de equipos
   const [menuButtonShowsLogo, setMenuButtonShowsLogo] = useState(false); // Alternar entre ☰ y logo
 
   const longPressTimer = useRef(null);
@@ -91,39 +93,77 @@ function Lifecounter() {
   const menuButtonLongPress = useRef(null);
   const menuButtonLongPressTriggered = useRef(false);
 
-  const initializePlayers = (count, life) => {
+  const initializePlayers = (count, life, isTeamMode = false, teams = null) => {
     const newPlayers = [];
-    for (let i = 0; i < count; i++) {
+
+    if (isTeamMode && teams) {
+      // Para 2v2: crear 2 "jugadores" que representan equipos
       newPlayers.push({
-        id: i,
-        name: PREDEFINED_PLAYERS[i] || `Jugador ${i + 1}`,
+        id: 0,
+        name: teams.team1.join(' & '),
+        members: teams.team1, // Guardar miembros del equipo
         life: life,
-        color: PLAYER_COLORS[i % PLAYER_COLORS.length].value,
+        color: PLAYER_COLORS[0].value,
         backgroundImage: null,
         deck: '',
         manaColors: [],
         counters: {},
-        position: i,
+        position: 0,
       });
+      newPlayers.push({
+        id: 1,
+        name: teams.team2.join(' & '),
+        members: teams.team2,
+        life: life,
+        color: PLAYER_COLORS[1].value,
+        backgroundImage: null,
+        deck: '',
+        manaColors: [],
+        counters: {},
+        position: 1,
+      });
+    } else {
+      // Otros modos: jugadores individuales
+      for (let i = 0; i < count; i++) {
+        newPlayers.push({
+          id: i,
+          name: PREDEFINED_PLAYERS[i] || `Jugador ${i + 1}`,
+          life: life,
+          color: PLAYER_COLORS[i % PLAYER_COLORS.length].value,
+          backgroundImage: null,
+          deck: '',
+          manaColors: [],
+          counters: {},
+          position: i,
+        });
+      }
     }
+
     setPlayers(newPlayers);
   };
 
   const selectGameMode = (mode, count, life) => {
     setGameMode(mode);
-    setPlayerCount(count);
     setStartingLife(life);
 
     /* NOTA: Para editar asientos por modo de juego:
        - 1v1: count = 2 (2 asientos)
-       - 2v2: count = 4 o 2 (para equipos usar 2)
+       - 2v2: count = 2 (2 equipos, cada equipo con 2 jugadores)
        - Commander: count = 4
        - Three-way: count = 3
     */
 
-    initializePlayers(count, life);
-    setSeatAssignment({});
-    setShowSeatAssignment(true);
+    if (mode === '2v2') {
+      // 2v2: 2 asientos (equipos), mostrar selección de equipos
+      setPlayerCount(2);
+      setTeamSelections({ team1: [], team2: [] });
+      setShowTeamSelection(true);
+    } else {
+      setPlayerCount(count);
+      initializePlayers(count, life);
+      setSeatAssignment({});
+      setShowSeatAssignment(true);
+    }
   };
 
   const assignPlayerToSeat = (seatIndex) => {
@@ -847,6 +887,82 @@ function Lifecounter() {
 
             <button className="lc-btn lc-btn-primary lc-btn-block" onClick={() => setSelectedPlayer(null)}>
               Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Selección de Equipos para 2v2 */}
+      {showTeamSelection && (
+        <div className="lc-modal">
+          <div className="lc-modal-content lc-team-selection-modal">
+            <h3>Formar Equipos (2v2)</h3>
+            <p className="lc-assignment-text">Selecciona 2 jugadores para el Equipo 1</p>
+
+            <div className="lc-team-formation">
+              <div className="lc-team-box">
+                <h4>Equipo 1</h4>
+                <div className="lc-team-members-list">
+                  {teamSelections.team1.length === 0 && <p className="lc-empty-team">Selecciona jugadores...</p>}
+                  {teamSelections.team1.map(name => (
+                    <div key={name} className="lc-team-member">
+                      {name}
+                      <button
+                        className="lc-remove-btn"
+                        onClick={() => setTeamSelections(prev => ({
+                          ...prev,
+                          team1: prev.team1.filter(n => n !== name)
+                        }))}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="lc-team-box">
+                <h4>Equipo 2</h4>
+                <div className="lc-team-members-list">
+                  {teamSelections.team2.length === 0 && <p className="lc-empty-team">Resto de jugadores...</p>}
+                  {teamSelections.team2.map(name => (
+                    <div key={name} className="lc-team-member">{name}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="lc-available-players">
+              {PREDEFINED_PLAYERS
+                .filter(name => !teamSelections.team1.includes(name) && !teamSelections.team2.includes(name))
+                .map(name => (
+                  <button
+                    key={name}
+                    className="lc-player-select-btn"
+                    onClick={() => {
+                      if (teamSelections.team1.length < 2) {
+                        const newTeam1 = [...teamSelections.team1, name];
+                        const remaining = PREDEFINED_PLAYERS.filter(n => !newTeam1.includes(n));
+                        setTeamSelections({ team1: newTeam1, team2: remaining });
+                      }
+                    }}
+                    disabled={teamSelections.team1.length >= 2}
+                  >
+                    {name}
+                  </button>
+                ))}
+            </div>
+
+            <button
+              className="lc-btn lc-btn-primary lc-btn-large"
+              disabled={teamSelections.team1.length !== 2}
+              onClick={() => {
+                initializePlayers(2, startingLife, true, teamSelections);
+                setShowTeamSelection(false);
+                setScreen('setup');
+              }}
+            >
+              Continuar
             </button>
           </div>
         </div>
