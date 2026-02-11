@@ -126,7 +126,7 @@
     position: absolute;
     top: -55px;
     /* Moved above the avatar */
-    left: 50%;
+    left: 27%;
     transform: translateX(-50%) rotate(-5deg);
     /* Added slight tilt for style */
     color: #fbbf24;

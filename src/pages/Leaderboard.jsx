@@ -92,7 +92,7 @@ const Leaderboard = () => {
                 <img src="/logo-lifecounter.png" alt="Lifecounter" className="fab-logo" />
             </button>
 
-            {/* Footer */}
+            {/* Footer 
             <footer className="leaderboard-footer">
                 <div className="footer-content">
                     <button onClick={() => navigate('/')} className="footer-link">
@@ -103,9 +103,8 @@ const Leaderboard = () => {
                         <span>Lifecounter</span>
                     </button>
                 </div>
-            </footer>
+            </footer>*/}
         </div>
     );
 };
-
 export default Leaderboard;

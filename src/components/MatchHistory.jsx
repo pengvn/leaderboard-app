@@ -13,7 +13,7 @@ const MatchHistory = ({ matches, users }) => {
     const getUser = (id) => users.find(u => u.id === id) || { name: 'Unknown' };
 
     if (!matches || matches.length === 0) {
-        return <div className="no-matches">No matches recorded yet.</div>;
+        return <div className="no-matches">No se ha jugado todavía, Juan tiene miedo</div>;
     }
 
     return (
