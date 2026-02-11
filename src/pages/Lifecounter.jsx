@@ -113,6 +113,14 @@ function Lifecounter() {
     setGameMode(mode);
     setPlayerCount(count);
     setStartingLife(life);
+
+    /* NOTA: Para editar asientos por modo de juego:
+       - 1v1: count = 2 (2 asientos)
+       - 2v2: count = 4 o 2 (para equipos usar 2)
+       - Commander: count = 4
+       - Three-way: count = 3
+    */
+
     initializePlayers(count, life);
     setSeatAssignment({});
     setShowSeatAssignment(true);
@@ -488,6 +496,15 @@ function Lifecounter() {
           </div>
 
           <div className="lc-game-modes">
+            {/* NOTA: Para editar diseño de modos:
+                - Iconos: cambiar className="lc-mode-icon"
+                - Vidas iniciales: tercer parámetro (20 o 40)
+                - Número de asientos: segundo parámetro
+                  * 1v1: 2 asientos
+                  * 2v2: 4 asientos (o 2 para equipos)
+                  * Commander: 4 asientos
+                  * Three-way: 3 asientos
+            */}
             <button className="lc-mode-card" onClick={() => selectGameMode('1v1', 2, 20)}>
               <div className="lc-mode-icon">⚔️</div>
               <h3>1v1</h3>
