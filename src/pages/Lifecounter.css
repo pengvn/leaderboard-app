@@ -838,6 +838,150 @@
   order: 5;
 }
 
+/* ========================================
+   ORDEN PERSONALIZADO POR POSICIÓN
+   ======================================== */
+
+/*
+   Para cambiar el orden de elementos en posiciones específicas,
+   usa la propiedad 'order' (números más bajos aparecen primero)
+*/
+
+/* Orden personalizado para ARRIBA-IZQUIERDA en Commander */
+/* Orden deseado: Contadores → Maná → Vida → Deck → Nombre */
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-counters-display {
+  order: 1; /* Contadores primero */
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-mana-display {
+  order: 2; /* Maná segundo */
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-life-counter {
+  order: 3; /* Vida tercero */
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-player-deck {
+  order: 4; /* Deck cuarto */
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-player-name {
+  order: 5; /* Nombre quinto */
+}
+
+/* Orden personalizado para ARRIBA-DERECHA en Commander */
+/* Orden deseado: Maná → Nombre → Deck → Vida → Contadores */
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-counters-display {
+  order: 1; /* Contadores primero */
+}
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-mana-display {
+  order: 2; /* Maná segundo */
+}
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-life-counter {
+  order: 3; /* Vida tercero */
+}
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-player-deck {
+  order: 4; /* Deck cuarto (debajo del nombre) */
+}
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-player-name {
+  order: 5; /* Nombre quinto */
+}
+
+/* ========================================
+   ESPACIADO POR ORIENTACIÓN
+   ======================================== */
+
+/*
+   Cambiar gap según orientación del dispositivo:
+
+   LANDSCAPE (horizontal): Reglas normales
+   PORTRAIT (vertical): Reglas dentro de @media (orientation: portrait)
+*/
+
+/* -------------------- LANDSCAPE (horizontal) -------------------- */
+
+/* Ejemplo: GAP para arriba-izquierda en LANDSCAPE */
+/*
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player {
+  gap: 0.8rem; <- Espacio entre elementos cuando el dispositivo está horizontal
+}
+*/
+
+/* Ejemplo: GAP para TODOS los asientos superiores en Commander (LANDSCAPE) */
+/*
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player,
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player {
+  gap: 1rem; <- Más espacio en asientos de arriba (landscape)
+}
+*/
+
+/* -------------------- PORTRAIT (vertical) -------------------- */
+/*
+   Las reglas de PORTRAIT van dentro de la sección:
+   @media (orientation: portrait) { }
+
+   Esta sección ya existe más abajo en el archivo (línea ~1897).
+   Para agregar espaciado en portrait, busca esa sección y agrega:
+*/
+
+/* -------------------- Ejemplos para LANDSCAPE -------------------- */
+
+/* Ejemplo: Reducir espacio entre nombre y deck en arriba-izquierda */
+/*
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-player-name {
+  margin-bottom: 0.1rem; <- MENOS espacio entre nombre y deck
+}
+*/
+
+/* Ejemplo: Eliminar espacio entre nombre y deck en TODOS los asientos superiores */
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-player-name,
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-player-name {
+  margin-bottom: 0rem;
+}
+
+/* ========================================
+   CENTRADO DEL CONTADOR DE VIDA (EJE CENTRAL)
+   ======================================== */
+
+/*
+   El contador de vida funciona como EJE CENTRAL.
+   Los elementos de arriba y abajo se ajustan respecto a él.
+
+   margin-top: Espacio desde elementos superiores hasta la vida
+   margin-bottom: Espacio desde la vida hasta elementos inferiores
+*/
+
+/* LANDSCAPE - Espaciado del centro en horizontal */
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-life-counter,
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-life-counter {
+  margin-top: 0rem;    /* ← MODIFICA AQUÍ: Espacio desde arriba hasta el centro */
+  margin-bottom: 0rem; /* ← MODIFICA AQUÍ: Espacio desde el centro hasta abajo */
+}
+
+/* Reducir gap general para que el centro sea el punto de referencia */
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player,
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player {
+  gap: 0rem; /* ← MODIFICA AQUÍ: Espacio pequeño entre elementos (no afecta al centro) */
+}
+
+/* LANDSCAPE - Espaciado del centro para asientos de ABAJO */
+.lc-game-board.lc-mode-commander .lc-player-panel.bottom-left-player .lc-life-counter,
+.lc-game-board.lc-mode-commander .lc-player-panel.bottom-right-player .lc-life-counter {
+  margin-top: 0rem !important;    /* ← MODIFICA AQUÍ: Espacio desde arriba hasta el centro */
+  margin-bottom: 0rem !important; /* ← MODIFICA AQUÍ: Espacio desde el centro hasta abajo */
+}
+
+/* Reducir gap general para asientos de ABAJO */
+.lc-game-board.lc-mode-commander .lc-player-panel.bottom-left-player,
+.lc-game-board.lc-mode-commander .lc-player-panel.bottom-right-player {
+  gap: 0rem !important; /* ← MODIFICA AQUÍ: Espacio pequeño entre elementos (no afecta al centro) */
+  /* !important asegura que esta regla sobrescriba las reglas generales */
+}
+
+
 /* SOLO en LANDSCAPE, rotar el contenido de top-player 180° */
 
 .lc-player-panel.active-turn {
@@ -882,6 +1026,56 @@
   color: white;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
+
+/* ========================================
+   COLORES UNIFORMES - ARRIBA Y ABAJO
+   ======================================== */
+
+/* Forzar mismo color en TODOS los asientos (Commander) */
+
+/* Nombre del jugador - Blanco sólido ARRIBA del fondo */
+.lc-game-board.lc-mode-commander .lc-player-panel .lc-player-name {
+  color: white !important; /* ← MODIFICA AQUÍ: Color del nombre */
+  opacity: 1 !important;   /* ← Sin transparencia */
+  position: relative !important; /* ← Necesario para z-index */
+  z-index: 10 !important; /* ← ARRIBA del fondo (::before tiene z-index: 0) */
+}
+
+/* Nombre del mazo - Blanco transparente (70%) ARRIBA del fondo */
+.lc-game-board.lc-mode-commander .lc-player-panel .lc-player-deck {
+  color: rgba(255, 255, 255, 0.7) !important; /* ← MODIFICA AQUÍ: Color del deck */
+  opacity: 1 !important;   /* ← Sin transparencia adicional */
+  position: relative !important; /* ← Necesario para z-index */
+  z-index: 10 !important; /* ← ARRIBA del fondo */
+}
+
+/* ========================================
+   OSCURECER IMAGEN DE FONDO (OPCIONAL)
+   ======================================== */
+
+/*
+   Si querés que la imagen de fondo sea más oscura para mejor contraste,
+   descomenta estas líneas:
+*/
+
+/*
+.lc-game-board.lc-mode-commander .lc-player-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3); <- MODIFICA AQUÍ: Oscuridad (0.0 = sin oscurecer, 0.5 = muy oscuro)
+  pointer-events: none;
+  z-index: 0;
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel > * {
+  position: relative;
+  z-index: 1;
+}
+*/
 
 .lc-player-deck {
   font-size: 0.85rem;
@@ -2101,6 +2295,72 @@
   /* Asiento ABAJO IZQUIERDA - Sin rotación por defecto (0°) */
 
   /* Asiento ABAJO DERECHA - Sin rotación por defecto (0°) */
+
+  /* ========================================
+     ESPACIADO PERSONALIZADO - PORTRAIT
+     ======================================== */
+
+  /*
+     Aquí podés cambiar el gap/espaciado cuando el dispositivo está VERTICAL
+
+     Ejemplo: MENOS espacio en portrait para aprovechar el espacio vertical
+  */
+
+  /* Ejemplo: Reducir gap en arriba-izquierda cuando está vertical */
+  /*
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player {
+    gap: 0.3rem; <- Menos espacio entre elementos en vertical
+  }
+  */
+
+  /* Ejemplo: Reducir gap general en TODOS los asientos en portrait */
+  /*
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player,
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player,
+  .lc-game-board.lc-mode-commander .lc-player-panel.bottom-left-player,
+  .lc-game-board.lc-mode-commander .lc-player-panel.bottom-right-player {
+    gap: 0.4rem; <- Espacio general entre elementos en portrait
+  }
+  */
+
+  /* Ejemplo: Reducir espacio entre nombre y deck en portrait */
+  /*
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-player-name,
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-player-name {
+    margin-bottom: 0; <- SIN espacio entre nombre y deck en portrait
+  }
+  */
+
+  /* ========================================
+     CENTRADO DEL CONTADOR DE VIDA - PORTRAIT
+     ======================================== */
+
+  /* PORTRAIT - Espaciado del centro para asientos de ARRIBA */
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-life-counter,
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-life-counter {
+    margin-top: 0.3rem;    /* ← MODIFICA AQUÍ: Espacio desde arriba hasta el centro */
+    margin-bottom: 0.3rem; /* ← MODIFICA AQUÍ: Espacio desde el centro hasta abajo */
+  }
+
+  /* Reducir gap general para asientos de ARRIBA en portrait */
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player,
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player {
+    gap: 0.1rem; /* ← MODIFICA AQUÍ: Espacio muy pequeño entre elementos */
+  }
+
+  /* PORTRAIT - Espaciado del centro para asientos de ABAJO */
+  .lc-game-board.lc-mode-commander .lc-player-panel.bottom-left-player .lc-life-counter,
+  .lc-game-board.lc-mode-commander .lc-player-panel.bottom-right-player .lc-life-counter {
+    margin-top: 0.3rem !important;    /* ← MODIFICA AQUÍ: Espacio desde arriba hasta el centro */
+    margin-bottom: 0.3rem !important; /* ← MODIFICA AQUÍ: Espacio desde el centro hasta abajo */
+  }
+
+  /* Reducir gap general para asientos de ABAJO en portrait */
+  .lc-game-board.lc-mode-commander .lc-player-panel.bottom-left-player,
+  .lc-game-board.lc-mode-commander .lc-player-panel.bottom-right-player {
+    gap: 0.1rem !important; /* ← MODIFICA AQUÍ: Espacio muy pequeño entre elementos */
+  }
+  
 
   /* Elementos más compactos en portrait */
   .lc-player-panel {
