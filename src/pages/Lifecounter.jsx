@@ -191,28 +191,26 @@ function Lifecounter() {
     }
   };
 
-  // Determinar si un jugador está en la parte superior del tablero
-  const isTopPlayer = (playerId) => {
-    if (gameMode === '1v1') return playerId === 0;
-    if (gameMode === '2v2' || gameMode === 'Commander') return playerId < 2;
-    if (gameMode === 'Three-way') return playerId === 0;
-    return false;
-  };
+  // Determinar posición específica del jugador para aplicar rotaciones
+  const getPlayerPositionClass = (playerId) => {
+    if (gameMode === '1v1' || gameMode === '2v2') {
+      // 2 asientos: solo arriba y abajo
+      return playerId === 0 ? 'top-player' : 'bottom-player';
+    }
 
-  // Determinar si un jugador está a la izquierda (para modo portrait)
-  const isLeftPlayer = (playerId) => {
-    if (gameMode === '1v1') return playerId === 0;
-    if (gameMode === '2v2' || gameMode === 'Commander') return playerId === 0 || playerId === 2;
-    if (gameMode === 'Three-way') return playerId === 0 || playerId === 1;
-    return false;
-  };
+    if (gameMode === 'Commander') {
+      // 4 asientos: arriba-izq, arriba-der, abajo-izq, abajo-der
+      const positions = ['top-left-player', 'top-right-player', 'bottom-left-player', 'bottom-right-player'];
+      return positions[playerId] || '';
+    }
 
-  // Determinar si un jugador está a la derecha (para modo portrait)
-  const isRightPlayer = (playerId) => {
-    if (gameMode === '1v1') return playerId === 1;
-    if (gameMode === '2v2' || gameMode === 'Commander') return playerId === 1 || playerId === 3;
-    if (gameMode === 'Three-way') return playerId === 2;
-    return false;
+    if (gameMode === 'Three-way') {
+      // 3 asientos: 1 arriba (ocupa todo), 2 abajo
+      const positions = ['top-player', 'bottom-left-player', 'bottom-right-player'];
+      return positions[playerId] || '';
+    }
+
+    return '';
   };
 
   const startGame = () => {
@@ -662,7 +660,7 @@ function Lifecounter() {
             {players.map(player => (
               <div
                 key={player.id}
-                className={`lc-player-panel ${currentTurn === player.id ? 'active-turn' : ''} ${player.life === 0 ? 'defeated' : ''} ${isTopPlayer(player.id) ? 'top-player' : ''} ${isLeftPlayer(player.id) ? 'left-player' : ''} ${isRightPlayer(player.id) ? 'right-player' : ''}`}
+                className={`lc-player-panel ${currentTurn === player.id ? 'active-turn' : ''} ${player.life === 0 ? 'defeated' : ''} ${getPlayerPositionClass(player.id)}`}
                 style={{
                   backgroundColor: player.color,
                   '--bg-image': player.backgroundImage ? `url(${player.backgroundImage})` : 'none'
@@ -942,8 +940,15 @@ function Lifecounter() {
                     onClick={() => {
                       if (teamSelections.team1.length < 2) {
                         const newTeam1 = [...teamSelections.team1, name];
-                        const remaining = PREDEFINED_PLAYERS.filter(n => !newTeam1.includes(n));
-                        setTeamSelections({ team1: newTeam1, team2: remaining });
+
+                        // Solo llenar team2 cuando team1 esté completo (2 jugadores)
+                        if (newTeam1.length === 2) {
+                          const remaining = PREDEFINED_PLAYERS.filter(n => !newTeam1.includes(n));
+                          setTeamSelections({ team1: newTeam1, team2: remaining });
+                        } else {
+                          // Solo actualizar team1, dejar team2 vacío
+                          setTeamSelections({ ...teamSelections, team1: newTeam1 });
+                        }
                       }
                     }}
                     disabled={teamSelections.team1.length >= 2}

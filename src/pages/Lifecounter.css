@@ -474,39 +474,272 @@
    6. Box de ronda (abajo-derecha desde su perspectiva)
 */
 
-/* Rotar background de jugadores superiores */
-.lc-player-panel.top-player::before {
+/* ╔════════════════════════════════════════════════════════════════════════════╗
+   ║                  ROTACIONES POR MODO DE JUEGO                              ║
+   ║                  Documentación de Edición                                  ║
+   ╚════════════════════════════════════════════════════════════════════════════╝
+
+   📌 ESTRUCTURA:
+   Las rotaciones están INDIVIDUALIZADAS por modo de juego.
+   Cada modo tiene sus propias reglas tanto para LANDSCAPE como PORTRAIT.
+
+   📍 UBICACIÓN EN EL CÓDIGO:
+
+   1. LANDSCAPE (horizontal):  Líneas ~477-750
+   2. PORTRAIT (vertical):     Dentro de @media (orientation: portrait)
+
+   🎯 CLASES DE POSICIÓN POR MODO:
+
+   1v1 y 2v2 (2 asientos):
+     - .top-player       → Jugador/Equipo arriba
+     - .bottom-player    → Jugador/Equipo abajo
+
+   Commander (4 asientos):
+     - .top-left-player      → Jugador arriba izquierda
+     - .top-right-player     → Jugador arriba derecha
+     - .bottom-left-player   → Jugador abajo izquierda
+     - .bottom-right-player  → Jugador abajo derecha
+
+   Three-way (3 asientos):
+     - .top-player           → Jugador arriba (ocupa toda la fila)
+     - .bottom-left-player   → Jugador abajo izquierda
+     - .bottom-right-player  → Jugador abajo derecha
+
+   🔧 CÓMO EDITAR ROTACIONES:
+
+   Para cambiar el ángulo de rotación de un asiento específico:
+   1. Busca la sección del modo (1v1, 2v2, Commander, Three-way)
+   2. Busca la orientación (LANDSCAPE o PORTRAIT)
+   3. Busca la clase de posición (ej: .top-left-player)
+   4. Modifica el valor en transform: rotate(XXdeg)
+
+   Ejemplo - Cambiar rotación del jugador arriba-derecha en Commander:
+   .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-life-value {
+     transform: rotate(180deg);  ← Cambiar este valor
+   }
+
+   ⚠️ IMPORTANTE:
+   Si cambias la rotación de un elemento, DEBES cambiar TODOS estos elementos
+   para mantener coherencia visual:
+     * .lc-life-value
+     * .lc-life-btn
+     * .lc-player-name
+     * .lc-player-deck
+     * .lc-mana-display
+     * .lc-counters-display
+     * .lc-counter-item
+     * .lc-turn-indicator .lc-turn-info
+     * ::before (background)
+
+*/
+
+/* ========================================
+   ROTACIONES POR MODO DE JUEGO - LANDSCAPE
+   ======================================== */
+
+/*
+   LANDSCAPE es el modo horizontal (dispositivo acostado)
+   Jugadores arriba rotan 180°, jugadores abajo sin rotación
+*/
+
+/* -------------------- 1v1 - LANDSCAPE -------------------- */
+/* 2 asientos: arriba y abajo
+   - Asiento ARRIBA:  Rotación 180°
+   - Asiento ABAJO:   Sin rotación (0°)
+*/
+
+/* Asiento ARRIBA */
+.lc-game-board.lc-mode-1v1 .lc-player-panel.top-player::before {
   transform: rotate(180deg);
 }
 
-/* Rotar contenido de jugadores superiores 180° */
-.lc-player-panel.top-player .lc-life-value,
-.lc-player-panel.top-player .lc-life-btn {
+.lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-life-value,
+.lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-life-btn {
   transform: rotate(180deg);
 }
 
-.lc-player-panel.top-player .lc-counters-display,
-.lc-player-panel.top-player .lc-mana-display,
-.lc-player-panel.top-player .lc-player-deck,
-.lc-player-panel.top-player .lc-player-name {
+.lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-counters-display,
+.lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-mana-display,
+.lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-player-deck,
+.lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-player-name {
   transform: rotate(180deg);
 }
 
-.lc-player-panel.top-player .lc-counter-item {
+.lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-counter-item {
   transform: rotate(180deg);
 }
 
-/* Box de ronda para jugadores superiores: arriba-izquierda */
-.lc-player-panel.top-player .lc-turn-indicator {
+.lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-turn-indicator {
   top: 1rem;
   left: 1rem;
   bottom: auto;
   right: auto;
 }
 
-.lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
+.lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
   transform: rotate(180deg);
 }
+
+/* Asiento ABAJO - Sin rotación por defecto (0°) */
+
+/* -------------------- 2v2 - LANDSCAPE -------------------- */
+/* 2 asientos (equipos): arriba y abajo
+   - Asiento ARRIBA:  Rotación 180°
+   - Asiento ABAJO:   Sin rotación (0°)
+*/
+
+/* Asiento ARRIBA */
+.lc-game-board.lc-mode-2v2 .lc-player-panel.top-player::before {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-life-value,
+.lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-life-btn {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-counters-display,
+.lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-mana-display,
+.lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-player-deck,
+.lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-player-name {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-counter-item {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-turn-indicator {
+  top: 1rem;
+  left: 1rem;
+  bottom: auto;
+  right: auto;
+}
+
+.lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
+  transform: rotate(180deg);
+}
+
+/* Asiento ABAJO - Sin rotación por defecto (0°) */
+
+/* -------------------- Commander - LANDSCAPE -------------------- */
+/* 4 asientos en cuadrícula 2x2:
+   - Asiento ARRIBA IZQUIERDA:   Rotación 180°
+   - Asiento ARRIBA DERECHA:     Rotación 180°
+   - Asiento ABAJO IZQUIERDA:    Sin rotación (0°)
+   - Asiento ABAJO DERECHA:      Sin rotación (0°)
+*/
+
+/* Asiento ARRIBA IZQUIERDA */
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player::before {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-life-value,
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-life-btn {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-counters-display,
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-mana-display,
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-player-deck,
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-player-name {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-counter-item {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-turn-indicator {
+  top: 1rem;
+  left: 1rem;
+  bottom: auto;
+  right: auto;
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-turn-indicator .lc-turn-info {
+  transform: rotate(180deg);
+}
+
+/* Asiento ARRIBA DERECHA */
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player::before {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-life-value,
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-life-btn {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-counters-display,
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-mana-display,
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-player-deck,
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-player-name {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-counter-item {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-turn-indicator {
+  top: 1rem;
+  left: 1rem;
+  bottom: auto;
+  right: auto;
+}
+
+.lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-turn-indicator .lc-turn-info {
+  transform: rotate(180deg);
+}
+
+/* Asiento ABAJO IZQUIERDA - Sin rotación por defecto (0°) */
+
+/* Asiento ABAJO DERECHA - Sin rotación por defecto (0°) */
+
+/* -------------------- Three-way - LANDSCAPE -------------------- */
+/* 3 asientos: 1 arriba (ocupa toda la fila), 2 abajo
+   - Asiento ARRIBA:          Rotación 180°
+   - Asiento ABAJO IZQUIERDA: Sin rotación (0°)
+   - Asiento ABAJO DERECHA:   Sin rotación (0°)
+*/
+
+/* Asiento ARRIBA */
+.lc-game-board.lc-mode-threeway .lc-player-panel.top-player::before {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-life-value,
+.lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-life-btn {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-counters-display,
+.lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-mana-display,
+.lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-player-deck,
+.lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-player-name {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-counter-item {
+  transform: rotate(180deg);
+}
+
+.lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-turn-indicator {
+  top: 1rem;
+  left: 1rem;
+  bottom: auto;
+  right: auto;
+}
+
+.lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
+  transform: rotate(180deg);
+}
+
+/* Asiento ABAJO IZQUIERDA - Sin rotación por defecto (0°) */
+
+/* Asiento ABAJO DERECHA - Sin rotación por defecto (0°) */
 
 
 /* ========================================
@@ -1659,74 +1892,215 @@
     right: 1rem;
   }
 
-  /* Rotar jugadores LEFT y RIGHT */
-  
-  /* Rotar backgrounds */
-  .lc-player-panel.left-player::before {
-    transform: rotate(90deg);
+  /* ========================================
+     ROTACIONES POR MODO DE JUEGO - PORTRAIT
+     ======================================== */
+
+  /*
+     PORTRAIT es el modo vertical (dispositivo de pie)
+     Los modos con 2 asientos mantienen arriba/abajo
+     Commander tiene 4 asientos específicos
+     Three-way tiene 3 asientos específicos
+  */
+
+  /* -------------------- 1v1 - PORTRAIT -------------------- */
+  /* 2 asientos: mantener arriba y abajo (igual que landscape)
+     - Asiento ARRIBA:  Rotación 180°
+     - Asiento ABAJO:   Sin rotación (0°)
+  */
+
+  /* Asiento ARRIBA */
+  .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player::before {
+    transform: rotate(180deg);
   }
 
-  .lc-player-panel.right-player::before {
-    transform: rotate(-90deg);
+  .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-life-value,
+  .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-life-btn {
+    transform: rotate(180deg);
   }
 
-  /* Rotar contenido de jugadores LEFT - 90° */
-  .lc-player-panel.left-player .lc-life-value,
-  .lc-player-panel.left-player .lc-life-btn {
-    transform: rotate(90deg);
+  .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-counters-display,
+  .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-mana-display,
+  .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-player-deck,
+  .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-player-name {
+    transform: rotate(180deg);
   }
 
-  .lc-player-panel.left-player .lc-counters-display,
-  .lc-player-panel.left-player .lc-mana-display,
-  .lc-player-panel.left-player .lc-player-deck,
-  .lc-player-panel.left-player .lc-player-name {
-    transform: rotate(90deg);
+  .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-counter-item {
+    transform: rotate(180deg);
   }
 
-  .lc-player-panel.left-player .lc-counter-item {
-    transform: rotate(90deg);
-  }
-
-  /* Box de ronda para LEFT player */
-  .lc-player-panel.left-player .lc-turn-indicator {
-    top: auto;
+  .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-turn-indicator {
+    top: 1rem;
     left: 1rem;
-    bottom: 1rem;
+    bottom: auto;
     right: auto;
   }
 
-  .lc-player-panel.left-player .lc-turn-indicator .lc-turn-info {
-    transform: rotate(90deg);
+  .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
+    transform: rotate(180deg);
   }
 
-  /* Rotar contenido de jugadores RIGHT - (-90°) */
-  .lc-player-panel.right-player .lc-life-value,
-  .lc-player-panel.right-player .lc-life-btn {
-    transform: rotate(-90deg);
+  /* Asiento ABAJO - Sin rotación por defecto (0°) */
+
+  /* -------------------- 2v2 - PORTRAIT -------------------- */
+  /* 2 asientos (equipos): mantener arriba y abajo (igual que landscape)
+     - Asiento ARRIBA:  Rotación 180°
+     - Asiento ABAJO:   Sin rotación (0°)
+  */
+
+  /* Asiento ARRIBA */
+  .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player::before {
+    transform: rotate(180deg);
   }
 
-  .lc-player-panel.right-player .lc-counters-display,
-  .lc-player-panel.right-player .lc-mana-display,
-  .lc-player-panel.right-player .lc-player-deck,
-  .lc-player-panel.right-player .lc-player-name {
-    transform: rotate(-90deg);
+  .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-life-value,
+  .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-life-btn {
+    transform: rotate(180deg);
   }
 
-  .lc-player-panel.right-player .lc-counter-item {
-    transform: rotate(-90deg);
+  .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-counters-display,
+  .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-mana-display,
+  .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-player-deck,
+  .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-player-name {
+    transform: rotate(180deg);
   }
 
-  /* Box de ronda para RIGHT player */
-  .lc-player-panel.right-player .lc-turn-indicator {
+  .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-counter-item {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-turn-indicator {
     top: 1rem;
-    left: auto;
+    left: 1rem;
     bottom: auto;
-    right: 1rem;
+    right: auto;
   }
 
-  .lc-player-panel.right-player .lc-turn-indicator .lc-turn-info {
-    transform: rotate(-90deg);
+  .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
+    transform: rotate(180deg);
   }
+
+  /* Asiento ABAJO - Sin rotación por defecto (0°) */
+
+  /* -------------------- Commander - PORTRAIT -------------------- */
+  /* 4 asientos específicos en cuadrícula 2x2:
+     - Asiento ARRIBA IZQUIERDA:   Rotación 180°
+     - Asiento ARRIBA DERECHA:     Rotación 180°
+     - Asiento ABAJO IZQUIERDA:    Sin rotación (0°)
+     - Asiento ABAJO DERECHA:      Sin rotación (0°)
+  */
+
+  /* Asiento ARRIBA IZQUIERDA */
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player::before {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-life-value,
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-life-btn {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-counters-display,
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-mana-display,
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-player-deck,
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-player-name {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-counter-item {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-turn-indicator {
+    top: 1rem;
+    left: 1rem;
+    bottom: auto;
+    right: auto;
+  }
+
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-turn-indicator .lc-turn-info {
+    transform: rotate(180deg);
+  }
+
+  /* Asiento ARRIBA DERECHA */
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player::before {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-life-value,
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-life-btn {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-counters-display,
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-mana-display,
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-player-deck,
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-player-name {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-counter-item {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-turn-indicator {
+    top: 1rem;
+    left: 1rem;
+    bottom: auto;
+    right: auto;
+  }
+
+  .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-turn-indicator .lc-turn-info {
+    transform: rotate(180deg);
+  }
+
+  /* Asiento ABAJO IZQUIERDA - Sin rotación por defecto (0°) */
+
+  /* Asiento ABAJO DERECHA - Sin rotación por defecto (0°) */
+
+  /* -------------------- Three-way - PORTRAIT -------------------- */
+  /* 3 asientos específicos:
+     - Asiento ARRIBA:          Rotación 180°
+     - Asiento ABAJO IZQUIERDA: Sin rotación (0°)
+     - Asiento ABAJO DERECHA:   Sin rotación (0°)
+  */
+
+  /* Asiento ARRIBA */
+  .lc-game-board.lc-mode-threeway .lc-player-panel.top-player::before {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-life-value,
+  .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-life-btn {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-counters-display,
+  .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-mana-display,
+  .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-player-deck,
+  .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-player-name {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-counter-item {
+    transform: rotate(180deg);
+  }
+
+  .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-turn-indicator {
+    top: 1rem;
+    left: 1rem;
+    bottom: auto;
+    right: auto;
+  }
+
+  .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
+    transform: rotate(180deg);
+  }
+
+  /* Asiento ABAJO IZQUIERDA - Sin rotación por defecto (0°) */
+
+  /* Asiento ABAJO DERECHA - Sin rotación por defecto (0°) */
 
   /* Elementos más compactos en portrait */
   .lc-player-panel {
