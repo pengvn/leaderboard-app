@@ -87,6 +87,9 @@ function Lifecounter() {
   const [teamSelections, setTeamSelections] = useState({ team1: [], team2: [] }); // Para 2v2
   const [showTeamSelection, setShowTeamSelection] = useState(false); // Pantalla de selección de equipos
   const [menuButtonShowsLogo, setMenuButtonShowsLogo] = useState(false); // Alternar entre ☰ y logo
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false); // Modal de contraseña
+  const [password, setPassword] = useState(''); // Input de contraseña
+  const [passwordError, setPasswordError] = useState(''); // Error de contraseña
 
   const longPressTimer = useRef(null);
   const longPressInterval = useRef(null);
@@ -361,7 +364,27 @@ function Lifecounter() {
     setScreen('result');
   };
 
+  const handleSaveResults = () => {
+    // Mostrar modal de contraseña
+    setShowPasswordPrompt(true);
+    setPassword('');
+    setPasswordError('');
+  };
+
   const saveResults = () => {
+    // Validar contraseña (puedes cambiar "mtg2026" por la que quieras)
+    const SAVE_PASSWORD = 'mtg2026';
+
+    if (password !== SAVE_PASSWORD) {
+      setPasswordError('Contraseña incorrecta');
+      return;
+    }
+
+    // Cerrar modal
+    setShowPasswordPrompt(false);
+    setPassword('');
+    setPasswordError('');
+
     // Ordenar jugadores por vida (mayor a menor) para determinar posiciones
     const sortedPlayers = [...players].sort((a, b) => b.life - a.life);
 
@@ -1128,8 +1151,66 @@ function Lifecounter() {
               <button className="lc-btn lc-btn-secondary" onClick={() => setScreen('welcome')}>
                 Nueva Partida
               </button>
-              <button className="lc-btn lc-btn-primary" onClick={saveResults}>
+              <button className="lc-btn lc-btn-primary" onClick={handleSaveResults}>
                 Cargar Información
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de contraseña para guardar partida */}
+      {showPasswordPrompt && (
+        <div className="lc-modal" onClick={() => setShowPasswordPrompt(false)}>
+          <div className="lc-modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>🔒 Autenticación Requerida</h3>
+            <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>
+              Ingresa la contraseña para guardar la partida
+            </p>
+
+            <div className="lc-form-group">
+              <label>Contraseña</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError('');
+                }}
+                onKeyPress={(e) => e.key === 'Enter' && saveResults()}
+                placeholder="Ingresa la contraseña"
+                autoFocus
+                style={{
+                  width: '100%',
+                  padding: '1rem',
+                  fontSize: '1rem',
+                  borderRadius: '8px',
+                  border: passwordError ? '2px solid #ff4757' : '2px solid rgba(255,255,255,0.2)',
+                  background: 'rgba(0,0,0,0.3)',
+                  color: 'white'
+                }}
+              />
+              {passwordError && (
+                <div style={{ color: '#ff4757', marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                  {passwordError}
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+              <button
+                className="lc-btn lc-btn-secondary"
+                onClick={() => setShowPasswordPrompt(false)}
+                style={{ flex: 1 }}
+              >
+                Cancelar
+              </button>
+              <button
+                className="lc-btn lc-btn-primary"
+                onClick={saveResults}
+                style={{ flex: 1 }}
+              >
+                Guardar
               </button>
             </div>
           </div>
