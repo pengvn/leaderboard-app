@@ -453,8 +453,26 @@
    ROTACIONES POR ORIENTACIÓN DEL DISPOSITIVO
    ======================================== */
 
-/* LANDSCAPE (horizontal) - Diseño por defecto */
-/* Jugadores TOP (arriba) ven el contenido rotado 180° */
+/* LANDSCAPE (horizontal) - Diseño por defecto
+
+   En modo horizontal, el dispositivo está acostado:
+   - Jugadores TOP (arriba): Rotan 180° para ver contenido correctamente
+   - Jugadores BOTTOM (abajo): Sin rotación
+
+   Disposición física:
+   Jugador↓(180°)  Jugador↓(180°)
+       Asiento         Asiento
+       Asiento         Asiento
+   Jugador↑(0°)    Jugador↑(0°)
+
+   Cada jugador ve el contenido en este orden:
+   1. Nombre
+   2. Nombre de mazo
+   3. - Vida +
+   4. Maná
+   5. Contadores
+   6. Box de ronda (abajo-derecha desde su perspectiva)
+*/
 
 /* Rotar background de jugadores superiores */
 .lc-player-panel.top-player::before {
@@ -1537,9 +1555,25 @@
    ======================================== */
 
 @media (orientation: portrait) {
-  /* PORTRAIT (vertical) - Cuando el dispositivo se gira vertical */
-  /* Los jugadores TOP también rotan 180° en portrait */
-  
+  /* PORTRAIT (vertical) - Cuando el dispositivo se gira vertical
+
+   En modo vertical, el dispositivo está de pie:
+   - Jugadores TOP: Mantienen rotación 180°
+   - Jugadores LEFT (izquierda): Rotan 90°
+   - Jugadores RIGHT (derecha): Rotan -90°
+
+   Disposición física:
+   Jugador→  Jugador↓  Jugador↓  Jugador←
+    (90°)    (180°)    (180°)    (-90°)
+    LEFT      TOP       TOP      RIGHT
+
+   NOTA PARA EDITAR MANUALMENTE:
+   - Para cambiar ángulos de rotación: modifica los valores rotate()
+   - Para cambiar posición del box de ronda: edita top/left/bottom/right
+   - Para resetear rotaciones de TOP en portrait, agrega:
+     .lc-player-panel.top-player .lc-life-value { transform: none; }
+  */
+
   /* Box de ronda para jugadores superiores en portrait: arriba-derecha */
   .lc-player-panel.top-player .lc-turn-indicator {
     top: 1rem;
