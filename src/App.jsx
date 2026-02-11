@@ -28,7 +28,7 @@ function App() {
           {' | '}
           <Link to="/lifecounter" style={{ color: 'inherit', textDecoration: 'none' }}>Lifecounter</Link>
           {' | '}
-          <Link to="/admin" style={{ color: 'inherit', textDecoration: 'none' }}>Admin</Link>
+          <a href="/admin" style={{ color: 'inherit', textDecoration: 'none' }}>Admin</a>
         </footer>
       </Router>
     </LeaderboardProvider>
