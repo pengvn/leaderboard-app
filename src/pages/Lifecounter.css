@@ -1538,37 +1538,14 @@
 
 @media (orientation: portrait) {
   /* PORTRAIT (vertical) - Cuando el dispositivo se gira vertical */
-  /* Resetear rotaciones de landscape */
+  /* Los jugadores TOP también rotan 180° en portrait */
   
-  .lc-player-panel.top-player::before {
-    transform: none;
-  }
-
-  .lc-player-panel.top-player .lc-life-value,
-  .lc-player-panel.top-player .lc-life-btn {
-    transform: none;
-  }
-
-  .lc-player-panel.top-player .lc-counters-display,
-  .lc-player-panel.top-player .lc-mana-display,
-  .lc-player-panel.top-player .lc-player-deck,
-  .lc-player-panel.top-player .lc-player-name {
-    transform: none;
-  }
-
-  .lc-player-panel.top-player .lc-counter-item {
-    transform: none;
-  }
-
+  /* Box de ronda para jugadores superiores en portrait: arriba-derecha */
   .lc-player-panel.top-player .lc-turn-indicator {
-    top: auto;
+    top: 1rem;
     left: auto;
-    bottom: 0.5rem;
-    right: 0.5rem;
-  }
-
-  .lc-player-panel.top-player .lc-turn-indicator .lc-turn-info {
-    transform: none;
+    bottom: auto;
+    right: 1rem;
   }
 
   /* Rotar jugadores LEFT y RIGHT */
