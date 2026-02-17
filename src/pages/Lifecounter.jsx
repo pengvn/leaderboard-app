@@ -64,7 +64,7 @@ const PLAYER_ID_MAP = {
 };
 
 function Lifecounter() {
-  const { logMatch, updateScore, users: leaderboardUsers } = useLeaderboard();
+  const { logMatch, updateScore, users: leaderboardUsers, setLastPointsGained } = useLeaderboard();
   const [screen, setScreen] = useState('welcome');
   const [gameMode, setGameMode] = useState(null);
   const [playerCount, setPlayerCount] = useState(0);
@@ -81,6 +81,7 @@ function Lifecounter() {
   const [highRollWinner, setHighRollWinner] = useState(null);
   const [showHighRollResult, setShowHighRollResult] = useState(false);
   const [victoryDetected, setVictoryDetected] = useState(false);
+  const [deathOrder, setDeathOrder] = useState([]); // Orden de muerte de jugadores [playerId, ...]
   const [seatAssignment, setSeatAssignment] = useState({}); // {seatIndex: playerName}
   const [assigningPlayer, setAssigningPlayer] = useState(null); // Jugador siendo asignado
   const [showSeatAssignment, setShowSeatAssignment] = useState(false);
@@ -354,6 +355,8 @@ function Lifecounter() {
       initializePlayers(playerCount, startingLife);
       setCurrentTurn(0);
       setTurnNumber(1);
+      setDeathOrder([]);
+      setVictoryDetected(false);
       setShowMenu(false);
       localStorage.removeItem('lifecounter_session');
     }
@@ -401,15 +404,29 @@ function Lifecounter() {
 
     const modality = modalityMap[gameMode] || '1v1';
 
+    // Calcular puestos basados en orden de muerte
+    // deathOrder tiene los IDs en orden de muerte (primero = murió primero = último puesto)
+    const getPlacement = (player) => {
+      const totalPlayers = players.length;
+      const deathIndex = deathOrder.indexOf(player.id);
+      if (deathIndex === -1) {
+        // Sigue vivo = puesto 1
+        return 1;
+      }
+      // Primer muerto = último puesto, segundo muerto = penúltimo, etc.
+      return totalPlayers - deathIndex;
+    };
+
     // Preparar datos del match (con estructura correcta para MatchHistory)
     const matchData = {
       modality: modality,
       winnerId: PLAYER_ID_MAP[sortedPlayers[0].name] || sortedPlayers[0].name.toLowerCase(),
       players: players.map(p => ({
-        id: PLAYER_ID_MAP[p.name] || p.name.toLowerCase(), // 'id' no 'userId'
-        deck: p.deck || 'Sin nombre', // 'deck' no 'deckName'
-        colors: Array.isArray(p.manaColors) ? p.manaColors : [], // Asegurar que sea array
-        life: p.life
+        id: PLAYER_ID_MAP[p.name] || p.name.toLowerCase(),
+        deck: p.deck || 'Sin nombre',
+        colors: Array.isArray(p.manaColors) ? p.manaColors : [],
+        life: p.life,
+        placement: getPlacement(p)
       }))
     };
 
@@ -417,31 +434,66 @@ function Lifecounter() {
     logMatch(matchData);
 
     // Actualizar puntos de cada jugador según su posición
-    sortedPlayers.forEach((player, index) => {
-      const playerId = PLAYER_ID_MAP[player.name] || player.name.toLowerCase();
-      const points = pointsSystem[index] || 0;
+    const pointsAssigned = [];
 
-      // Obtener score actual del jugador
-      const user = leaderboardUsers.find(u => u.id === playerId);
-      if (user) {
-        const currentScore = user.scores[modality] || 0;
-        const newScore = currentScore + points;
+    if (gameMode === '2v2') {
+      // 2v2: Equipo ganador = 4 puntos cada miembro, perdedor = 0
+      const winningTeam = sortedPlayers[0]; // Equipo con más vida
+      const losingTeam = sortedPlayers[1];
 
-        // Actualizar score en la modalidad específica
-        updateScore(playerId, modality, newScore);
+      const allMembers = [
+        ...(winningTeam.members || []).map(name => ({ name, points: 4 })),
+        ...(losingTeam.members || []).map(name => ({ name, points: 0 }))
+      ];
 
-        // Actualizar score overall
-        const currentOverall = user.scores.overall || 0;
-        updateScore(playerId, 'overall', currentOverall + points);
-      }
-    });
+      allMembers.forEach(({ name, points }) => {
+        const playerId = PLAYER_ID_MAP[name] || name.toLowerCase();
+        const user = leaderboardUsers.find(u => u.id === playerId);
+        if (user) {
+          updateScore(playerId, modality, (user.scores[modality] || 0) + points);
+        }
+        pointsAssigned.push(`${name}: ${points}pts`);
+      });
+    } else {
+      // Modos individuales: 5, 2, 1, 0 según posición
+      sortedPlayers.forEach((player, index) => {
+        const playerId = PLAYER_ID_MAP[player.name] || player.name.toLowerCase();
+        const points = pointsSystem[index] || 0;
+
+        const user = leaderboardUsers.find(u => u.id === playerId);
+        if (user) {
+          updateScore(playerId, modality, (user.scores[modality] || 0) + points);
+        }
+        pointsAssigned.push(`${player.name}: ${points}pts`);
+      });
+    }
+
+    // Guardar últimos puntos ganados para mostrar en el leaderboard
+    const newLastPoints = {};
+    if (gameMode === '2v2') {
+      const winningTeam = sortedPlayers[0];
+      const losingTeam = sortedPlayers[1];
+      [...(winningTeam.members || [])].forEach(name => {
+        const pid = PLAYER_ID_MAP[name] || name.toLowerCase();
+        newLastPoints[pid] = { [modality]: 4 };
+      });
+      [...(losingTeam.members || [])].forEach(name => {
+        const pid = PLAYER_ID_MAP[name] || name.toLowerCase();
+        newLastPoints[pid] = { [modality]: 0 };
+      });
+    } else {
+      sortedPlayers.forEach((player, index) => {
+        const pid = PLAYER_ID_MAP[player.name] || player.name.toLowerCase();
+        const pts = pointsSystem[index] || 0;
+        newLastPoints[pid] = { [modality]: pts };
+      });
+    }
+    setLastPointsGained(newLastPoints);
 
     console.log('Partida guardada:', matchData);
-    console.log('Puntos asignados:', sortedPlayers.map((p, i) => `${p.name}: ${pointsSystem[i] || 0}pts`));
+    console.log('Puntos asignados:', pointsAssigned);
 
-    alert(`¡Partida guardada!\n\nPuntos asignados:\n${sortedPlayers.map((p, i) =>
-      `${i + 1}° ${p.name}: ${pointsSystem[i] || 0} puntos`
-    ).join('\n')}`);
+    alert(`¡Partida guardada!\n\nPuntos asignados:\n${pointsAssigned.join('\n')}`);
 
     // Limpiar sesión guardada
     localStorage.removeItem('lifecounter_session');
@@ -472,11 +524,17 @@ function Lifecounter() {
       setPlayers(updatedPlayers);
     }
 
+    // Registrar jugadores que acaban de morir en el orden de muerte
+    const newlyDead = updatedPlayers.filter(p => p.life <= 0 && !deathOrder.includes(p.id));
+    if (newlyDead.length > 0) {
+      setDeathOrder(prev => [...prev, ...newlyDead.map(p => p.id)]);
+    }
+
     const alivePlayers = updatedPlayers.filter(p => p.life > 0);
     if (alivePlayers.length === 1 && !victoryDetected) {
       setVictoryDetected(true);
     }
-  }, [players, screen, victoryDetected]);
+  }, [players, screen, victoryDetected, deathOrder]);
 
   // Guardar sesión en localStorage cuando cambie el estado
   useEffect(() => {

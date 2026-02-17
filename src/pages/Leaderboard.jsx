@@ -9,21 +9,21 @@ import './Leaderboard.css';
 
 const Leaderboard = () => {
     const navigate = useNavigate();
-    const { users, matches, activeModality, setActiveModality, getSortedUsers } = useLeaderboard();
+    const { users, matches, activeModality, setActiveModality, getSortedUsers, getScore, lastPointsGained } = useLeaderboard();
 
     const sortedUsers = getSortedUsers(activeModality);
 
     // Top 3
     const topThree = sortedUsers.slice(0, 3).map(u => ({
         ...u,
-        currentScore: u.scores[activeModality] || 0
+        currentScore: getScore(u, activeModality)
     }));
 
     // List of ALL players below the podium table (as requested by user)
     const list = sortedUsers.map((u, i) => ({
         ...u,
         rank: i + 1,
-        currentScore: u.scores[activeModality] || 0
+        currentScore: getScore(u, activeModality)
     }));
 
     const hasActivity = topThree.length > 0 && topThree[0].currentScore > 0;
@@ -66,7 +66,19 @@ const Leaderboard = () => {
                                 />
                                 <span style={{ color: 'white' }}>{user.name}</span>
                             </div>
-                            <span className="score-num">{user.currentScore}</span>
+                            <span className="score-num">
+                                {user.currentScore}
+                                {(() => {
+                                    const pts = activeModality === 'overall'
+                                        ? (lastPointsGained[user.id]?.['1v1'] || 0) + (lastPointsGained[user.id]?.['2v2'] || 0) + (lastPointsGained[user.id]?.['commander'] || 0)
+                                        : (lastPointsGained[user.id]?.[activeModality] || 0);
+                                    return pts > 0 ? (
+                                        <span className="last-points-badge">
+                                            ^+{pts}
+                                        </span>
+                                    ) : null;
+                                })()}
+                            </span>
                         </div>
                     ))}
                 </div>

@@ -40,9 +40,13 @@ export const useLeaderboard = () => useContext(LeaderboardContext);
 export const LeaderboardProvider = ({ children }) => {
     const [users, setUsers] = useState(defaultUsers);
     const [matches, setMatches] = useState([]);
-    const [activeModality, setActiveModality] = useState('1v1');
+    const [activeModality, setActiveModality] = useState('overall');
     const [loading, setLoading] = useState(true);
     const [apiAvailable, setApiAvailable] = useState(true);
+    const [lastPointsGained, setLastPointsGained] = useState(() => {
+        const saved = localStorage.getItem('leaderboard_lastPoints');
+        return saved ? JSON.parse(saved) : {};
+    });
 
     // Load initial data from API on mount
     useEffect(() => {
@@ -89,6 +93,10 @@ export const LeaderboardProvider = ({ children }) => {
             localStorage.setItem('leaderboard_matches', JSON.stringify(matches));
         }
     }, [matches, apiAvailable]);
+
+    useEffect(() => {
+        localStorage.setItem('leaderboard_lastPoints', JSON.stringify(lastPointsGained));
+    }, [lastPointsGained]);
 
     // Update a specific user field (for UI state only)
     const updateUser = (userId, field, value) => {
@@ -199,8 +207,15 @@ export const LeaderboardProvider = ({ children }) => {
         }
     };
 
+    const getScore = (user, modality) => {
+        if (modality === 'overall') {
+            return (user.scores['1v1'] || 0) + (user.scores['2v2'] || 0) + (user.scores['commander'] || 0);
+        }
+        return user.scores[modality] || 0;
+    };
+
     const getSortedUsers = (modality) => {
-        return [...users].sort((a, b) => (b.scores[modality] || 0) - (a.scores[modality] || 0));
+        return [...users].sort((a, b) => getScore(b, modality) - getScore(a, modality));
     };
 
     return (
@@ -215,10 +230,13 @@ export const LeaderboardProvider = ({ children }) => {
             clearHistory,
             activeModality,
             setActiveModality,
+            getScore,
             getSortedUsers,
             loading,
             apiAvailable,
-            refreshData: loadData
+            refreshData: loadData,
+            lastPointsGained,
+            setLastPointsGained
         }}>
             {children}
         </LeaderboardContext.Provider>
