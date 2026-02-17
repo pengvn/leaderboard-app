@@ -434,6 +434,8 @@
   margin: 4px;
   gap: 0.5rem;
   /* Background solo en el color, la imagen va en ::before */
+  --player-name-size: 1.2rem;
+  --mana-icon-size: 32px;
 }
 
 /* Overlay semiopaco para fondos personalizados */
@@ -453,14 +455,29 @@
   z-index: 0;
 }
 
-/* 2v2: Fusión diagonal de fondos de miembros del equipo */
-/* Solo se activa con la clase .lc-fusion-bg */
+/* =============================================
+   2v2: FUSIÓN DIAGONAL DE FONDOS
+   =============================================
+   Variables para ajustar:
+   --fusion-size:    zoom de las imágenes (default: cover)
+   --fusion-pos-1:   posición de la imagen 1 / izq-abajo (default: center)
+   --fusion-pos-2:   posición de la imagen 2 / der-arriba (default: center)
+
+   El corte diagonal va de esquina a esquina (to top right)
+   pasando por el centro del panel, con un blend suave de 10%.
+   ============================================= */
+.lc-player-panel.lc-fusion-bg {
+  --fusion-size: 190%;          /* zoom: 100% = original, 200% = doble zoom, cover = llenar */
+  --fusion-pos-1: 100% 20%;  /* X Y de la imagen 1 (abajo-izq) */
+  --fusion-pos-2: 0% 15%;   /* X Y de la imagen 2 (arriba-der) */
+}
+
 .lc-player-panel.lc-fusion-bg::before {
   background-image: var(--bg-image-1, none);
-  background-size: 180%;
-  background-position: 30% center;
-  -webkit-mask-image: linear-gradient(45deg, black 40%, transparent 60%);
-  mask-image: linear-gradient(45deg, black 40%, transparent 60%);
+  background-size: var(--fusion-size);
+  background-position: var(--fusion-pos-1);
+  -webkit-mask-image: linear-gradient(to top right, black 45%, transparent 55%);
+  mask-image: linear-gradient(to top right, black 45%, transparent 55%);
 }
 
 .lc-player-panel.lc-fusion-bg::after {
@@ -471,14 +488,15 @@
   right: 0;
   bottom: 0;
   background-image: var(--bg-image-2, none);
-  background-size: 180%;
-  background-position: 70% center;
+  background-size: var(--fusion-size);
+  background-position: var(--fusion-pos-2);
   background-repeat: no-repeat;
   opacity: 0.4;
   filter: brightness(0.7);
   z-index: 0;
-  -webkit-mask-image: linear-gradient(45deg, transparent 40%, black 60%);
-  mask-image: linear-gradient(45deg, transparent 40%, black 60%);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to top right, transparent 45%, black 55%);
+  mask-image: linear-gradient(to top right, transparent 45%, black 55%);
 }
 
 /* Rotaciones para fusion en top player */
@@ -1058,7 +1076,7 @@
 /* Ya gestionado en la sección de orientación manual arriba */
 
 .lc-player-name {
-  font-size: 1.2rem;
+  font-size: var(--player-name-size, 1.2rem);
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: white;
@@ -1085,6 +1103,28 @@
   opacity: 1 !important;   /* ← Sin transparencia adicional */
   position: relative !important; /* ← Necesario para z-index */
   z-index: 10 !important; /* ← ARRIBA del fondo */
+}
+
+/* Forzar contenido ARRIBA del fondo en 2v2 */
+.lc-game-board.lc-mode-2v2 .lc-player-panel .lc-player-name {
+  color: white !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.lc-game-board.lc-mode-2v2 .lc-player-panel .lc-player-deck {
+  color: rgba(255, 255, 255, 0.7) !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.lc-game-board.lc-mode-2v2 .lc-player-panel .lc-mana-display,
+.lc-game-board.lc-mode-2v2 .lc-player-panel .lc-counters-display,
+.lc-game-board.lc-mode-2v2 .lc-player-panel .lc-life-counter {
+  position: relative !important;
+  z-index: 10 !important;
 }
 
 /* ========================================
@@ -1179,8 +1219,8 @@
 }
 
 .lc-mana-symbol-img {
-  width: 32px;
-  height: 32px;
+  width: var(--mana-icon-size, 32px);
+  height: var(--mana-icon-size, 32px);
   object-fit: contain;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
