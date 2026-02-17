@@ -358,7 +358,11 @@
   grid-template-rows: 1fr 1fr;
 }
 
-.lc-game-board.lc-mode-2v2,
+.lc-game-board.lc-mode-2v2 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
 .lc-game-board.lc-mode-commander {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -566,7 +570,7 @@
 }
 
 .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-counter-item {
-  transform: rotate(180deg);
+  flex-direction: row-reverse;
 }
 
 .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-turn-indicator {
@@ -606,7 +610,7 @@
 }
 
 .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-counter-item {
-  transform: rotate(180deg);
+  flex-direction: row-reverse;
 }
 
 .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-turn-indicator {
@@ -648,7 +652,7 @@
 }
 
 .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-counter-item {
-  transform: rotate(180deg);
+  flex-direction: row-reverse;
 }
 
 .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-turn-indicator {
@@ -680,7 +684,7 @@
 }
 
 .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-counter-item {
-  transform: rotate(180deg);
+  flex-direction: row-reverse;
 }
 
 .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-turn-indicator {
@@ -723,7 +727,7 @@
 }
 
 .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-counter-item {
-  transform: rotate(180deg);
+  flex-direction: row-reverse;
 }
 
 .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-turn-indicator {
@@ -1565,7 +1569,11 @@
   grid-template-rows: 1fr 1fr;
 }
 
-.lc-seat-grid.lc-mode-2v2,
+.lc-seat-grid.lc-mode-2v2 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
 .lc-seat-grid.lc-mode-commander {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -2121,7 +2129,7 @@
   }
 
   .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-counter-item {
-    transform: rotate(180deg);
+    flex-direction: row-reverse;
   }
 
   .lc-game-board.lc-mode-1v1 .lc-player-panel.top-player .lc-turn-indicator {
@@ -2161,7 +2169,7 @@
   }
 
   .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-counter-item {
-    transform: rotate(180deg);
+    flex-direction: row-reverse;
   }
 
   .lc-game-board.lc-mode-2v2 .lc-player-panel.top-player .lc-turn-indicator {
@@ -2203,7 +2211,7 @@
   }
 
   .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-counter-item {
-    transform: rotate(180deg);
+    flex-direction: row-reverse;
   }
 
   .lc-game-board.lc-mode-commander .lc-player-panel.top-left-player .lc-turn-indicator {
@@ -2235,7 +2243,7 @@
   }
 
   .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-counter-item {
-    transform: rotate(180deg);
+    flex-direction: row-reverse;
   }
 
   .lc-game-board.lc-mode-commander .lc-player-panel.top-right-player .lc-turn-indicator {
@@ -2278,7 +2286,7 @@
   }
 
   .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-counter-item {
-    transform: rotate(180deg);
+    flex-direction: row-reverse;
   }
 
   .lc-game-board.lc-mode-threeway .lc-player-panel.top-player .lc-turn-indicator {

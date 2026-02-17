@@ -300,13 +300,13 @@ function Lifecounter() {
 
   const nextTurn = () => {
     const getNextInRotation = (current) => {
-      if (gameMode === '1v1') {
+      if (gameMode === '1v1' || gameMode === '2v2') {
         return (current + 1) % playerCount;
       } else if (gameMode === 'Three-way') {
         const order = [0, 2, 1];
         const idx = order.indexOf(current);
         return order[(idx + 1) % order.length];
-      } else if (gameMode === '2v2' || gameMode === 'Commander') {
+      } else if (gameMode === 'Commander') {
         const order = [0, 1, 3, 2];
         const idx = order.indexOf(current);
         return order[(idx + 1) % order.length];
@@ -716,7 +716,8 @@ function Lifecounter() {
                         const counter = COUNTER_TYPES.find(c => c.id === type);
                         return value > 0 && (
                           <div key={type} className="lc-counter-item">
-                            {counter?.icon} {value}
+                            <span className="lc-counter-icon">{counter?.icon}</span>
+                            <span className="lc-counter-value">{value}</span>
                           </div>
                         );
                       })}
