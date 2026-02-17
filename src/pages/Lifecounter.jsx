@@ -55,6 +55,14 @@ const COUNTER_TYPES = [
   { id: 'colorless', name: 'Maná Incoloro', icon: '⬜' },
 ];
 
+// Mapeo de nombres a imagen de fondo por defecto
+const DEFAULT_BACKGROUNDS = {
+  'Pengvn': '/assets/pengvn.jpg',
+  'Rekatria': '/assets/rekaru.jpg',
+  'Hwan': '/assets/hwan.jpg',
+  'Emi': '/assets/emi.jpg'
+};
+
 // Mapeo de nombres a IDs del leaderboard
 const PLAYER_ID_MAP = {
   'Pengvn': 'pengvn',
@@ -96,6 +104,8 @@ function Lifecounter() {
   const longPressInterval = useRef(null);
   const menuButtonLongPress = useRef(null);
   const menuButtonLongPressTriggered = useRef(false);
+  const fileInputRef = useRef(null);
+  const [uploadTargetPlayer, setUploadTargetPlayer] = useState(null);
 
   const initializePlayers = (count, life, isTeamMode = false, teams = null) => {
     const newPlayers = [];
@@ -105,10 +115,11 @@ function Lifecounter() {
       newPlayers.push({
         id: 0,
         name: teams.team1.join(' & '),
-        members: teams.team1, // Guardar miembros del equipo
+        members: teams.team1,
+        memberImages: teams.team1.map(name => DEFAULT_BACKGROUNDS[name] || null),
         life: life,
         color: PLAYER_COLORS[0].value,
-        backgroundImage: null,
+        backgroundImage: 'fusion',
         deck: '',
         manaColors: [],
         counters: {},
@@ -118,9 +129,10 @@ function Lifecounter() {
         id: 1,
         name: teams.team2.join(' & '),
         members: teams.team2,
+        memberImages: teams.team2.map(name => DEFAULT_BACKGROUNDS[name] || null),
         life: life,
         color: PLAYER_COLORS[1].value,
-        backgroundImage: null,
+        backgroundImage: 'fusion',
         deck: '',
         manaColors: [],
         counters: {},
@@ -129,12 +141,13 @@ function Lifecounter() {
     } else {
       // Otros modos: jugadores individuales
       for (let i = 0; i < count; i++) {
+        const playerName = PREDEFINED_PLAYERS[i] || `Jugador ${i + 1}`;
         newPlayers.push({
           id: i,
-          name: PREDEFINED_PLAYERS[i] || `Jugador ${i + 1}`,
+          name: playerName,
           life: life,
           color: PLAYER_COLORS[i % PLAYER_COLORS.length].value,
-          backgroundImage: null,
+          backgroundImage: DEFAULT_BACKGROUNDS[playerName] || null,
           deck: '',
           manaColors: [],
           counters: {},
@@ -289,6 +302,18 @@ function Lifecounter() {
       clearTimeout(menuButtonLongPress.current);
       menuButtonLongPress.current = null;
     }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || uploadTargetPlayer === null) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      updatePlayer(uploadTargetPlayer, { backgroundImage: reader.result });
+      setUploadTargetPlayer(null);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
   };
 
   const handleMenuButtonClick = () => {
@@ -721,11 +746,33 @@ function Lifecounter() {
                         {!bg.url && <span style={{ fontSize: '0.7rem', color: '#666' }}>Sin</span>}
                       </div>
                     ))}
+                    {player.memberImages && (
+                      <div
+                        className={`lc-background-option lc-bg-fusion ${player.backgroundImage === 'fusion' ? 'selected' : ''}`}
+                        style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                        onClick={() => updatePlayer(player.id, { backgroundImage: 'fusion' })}
+                        title="Fusión de fondos"
+                      >
+                        <span style={{ fontSize: '0.6rem', color: '#ccc', textAlign: 'center', lineHeight: 1.2 }}>Fusion</span>
+                      </div>
+                    )}
+                    <div
+                      className={`lc-background-option lc-bg-upload ${player.backgroundImage && player.backgroundImage !== 'fusion' && !BACKGROUND_IMAGES.some(bg => bg.url === player.backgroundImage) ? 'selected' : ''}`}
+                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                      onClick={() => {
+                        setUploadTargetPlayer(player.id);
+                        fileInputRef.current?.click();
+                      }}
+                      title="Subir imagen"
+                    >
+                      <span style={{ fontSize: '1.5rem', color: '#888' }}>+</span>
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+          <input type="file" accept="image/*" ref={fileInputRef} hidden onChange={handleImageUpload} />
           <div className="lc-setup-footer">
             <button className="lc-btn lc-btn-primary lc-btn-large" onClick={startGame}>
               Comenzar Partida
@@ -741,10 +788,12 @@ function Lifecounter() {
             {players.map(player => (
               <div
                 key={player.id}
-                className={`lc-player-panel ${currentTurn === player.id ? 'active-turn' : ''} ${player.life === 0 ? 'defeated' : ''} ${getPlayerPositionClass(player.id)}`}
+                className={`lc-player-panel ${currentTurn === player.id ? 'active-turn' : ''} ${player.life === 0 ? 'defeated' : ''} ${getPlayerPositionClass(player.id)} ${player.backgroundImage === 'fusion' ? 'lc-fusion-bg' : ''}`}
                 style={{
                   backgroundColor: player.color,
-                  '--bg-image': player.backgroundImage ? `url(${player.backgroundImage})` : 'none'
+                  '--bg-image': player.backgroundImage && player.backgroundImage !== 'fusion' ? `url(${player.backgroundImage})` : 'none',
+                  '--bg-image-1': player.memberImages?.[0] ? `url(${player.memberImages[0]})` : 'none',
+                  '--bg-image-2': player.memberImages?.[1] ? `url(${player.memberImages[1]})` : 'none'
                 }}
               >
                 {/* Sección de información del jugador */}
@@ -920,6 +969,27 @@ function Lifecounter() {
                     {!bg.url && <span style={{ fontSize: '0.7rem', color: '#999' }}>Sin</span>}
                   </div>
                 ))}
+                {players[selectedPlayer]?.memberImages && (
+                  <div
+                    className={`lc-background-option lc-bg-fusion ${players[selectedPlayer]?.backgroundImage === 'fusion' ? 'selected' : ''}`}
+                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                    onClick={() => updatePlayer(selectedPlayer, { backgroundImage: 'fusion' })}
+                    title="Fusión de fondos"
+                  >
+                    <span style={{ fontSize: '0.6rem', color: '#ccc', textAlign: 'center', lineHeight: 1.2 }}>Fusion</span>
+                  </div>
+                )}
+                <div
+                  className={`lc-background-option lc-bg-upload ${players[selectedPlayer]?.backgroundImage && players[selectedPlayer]?.backgroundImage !== 'fusion' && !BACKGROUND_IMAGES.some(bg => bg.url === players[selectedPlayer]?.backgroundImage) ? 'selected' : ''}`}
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                  onClick={() => {
+                    setUploadTargetPlayer(selectedPlayer);
+                    fileInputRef.current?.click();
+                  }}
+                  title="Subir imagen"
+                >
+                  <span style={{ fontSize: '1.5rem', color: '#888' }}>+</span>
+                </div>
               </div>
             </div>
 

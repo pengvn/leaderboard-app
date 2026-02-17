@@ -10,7 +10,7 @@ const MANA_IMAGES = {
 };
 
 const MatchHistory = ({ matches, users }) => {
-    const getUser = (id) => users.find(u => u.id === id) || { name: 'Unknown' };
+    const getUser = (id) => users.find(u => u.id === id) || { name: id || 'Unknown' };
 
     if (!matches || matches.length === 0) {
         return <div className="no-matches">No se ha jugado todavía, Juan tiene miedo</div>;
@@ -36,6 +36,7 @@ const MatchHistory = ({ matches, users }) => {
                                         <React.Fragment key={index}>
                                             <div className={`match-player ${isWinner ? 'winner' : 'loser'}`}>
                                                 <span className="player-name">
+                                                    {p.placement && <span className="placement-badge">#{p.placement}</span>}
                                                     {user.name}
                                                     {isWinner && <span className="crown-tiny">👑</span>}
                                                 </span>
@@ -43,16 +44,17 @@ const MatchHistory = ({ matches, users }) => {
                                                     <span>{p.deck}</span>
                                                     {p.colors && p.colors.length > 0 && (
                                                         <span className="colors">
-                                                            {p.colors.map(c =>
-                                                                MANA_IMAGES[c] ? (
+                                                            {p.colors.map(c => {
+                                                                const key = c.toUpperCase();
+                                                                return MANA_IMAGES[key] ? (
                                                                     <img
                                                                         key={c}
-                                                                        src={MANA_IMAGES[c]}
+                                                                        src={MANA_IMAGES[key]}
                                                                         alt={c}
                                                                         className="mana-icon"
                                                                     />
-                                                                ) : null
-                                                            )}
+                                                                ) : null;
+                                                            })}
                                                         </span>
                                                     )}
                                                 </div>

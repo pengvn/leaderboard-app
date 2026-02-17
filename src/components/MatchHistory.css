@@ -83,6 +83,12 @@
     justify-content: center;
 }
 
+.placement-badge {
+    font-size: 0.7rem;
+    color: #888;
+    margin-right: 0.2rem;
+}
+
 .crown-tiny {
     font-size: 0.8rem;
     color: #fbbf24;

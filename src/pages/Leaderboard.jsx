@@ -65,6 +65,15 @@ const Leaderboard = () => {
                                     }}
                                 />
                                 <span style={{ color: 'white' }}>{user.name}</span>
+                                {(() => {
+                                    const pts = activeModality === 'overall'
+                                        ? (lastPointsGained[user.id]?.['1v1'] || 0) + (lastPointsGained[user.id]?.['2v2'] || 0) + (lastPointsGained[user.id]?.['commander'] || 0)
+                                        : (lastPointsGained[user.id]?.[activeModality] || 0);
+                                    if (lastPointsGained[user.id]) {
+                                        return <span className={`change-indicator ${pts > 0 ? 'up' : 'neutral'}`}>{pts > 0 ? '^' : '-'}</span>;
+                                    }
+                                    return null;
+                                })()}
                             </div>
                             <span className="score-num">
                                 {user.currentScore}
@@ -74,7 +83,7 @@ const Leaderboard = () => {
                                         : (lastPointsGained[user.id]?.[activeModality] || 0);
                                     return pts > 0 ? (
                                         <span className="last-points-badge">
-                                            ^+{pts}
+                                            +{pts}
                                         </span>
                                     ) : null;
                                 })()}

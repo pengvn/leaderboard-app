@@ -2,10 +2,10 @@ import React from 'react';
 import './Tabs.css';
 
 const modalities = [
+    { id: 'overall', label: 'Overall' },
     { id: '1v1', label: '1 vs 1' },
     { id: '2v2', label: '2 vs 2' },
-    { id: 'commander', label: 'Commander' },
-    { id: 'overall', label: 'Overall' }
+    { id: 'commander', label: 'Commander' }
 ];
 
 const Tabs = ({ activeTab, onTabChange }) => {

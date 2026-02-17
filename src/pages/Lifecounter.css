@@ -453,6 +453,40 @@
   z-index: 0;
 }
 
+/* 2v2: Fusión diagonal de fondos de miembros del equipo */
+/* Solo se activa con la clase .lc-fusion-bg */
+.lc-player-panel.lc-fusion-bg::before {
+  background-image: var(--bg-image-1, none);
+  background-size: 180%;
+  background-position: 30% center;
+  -webkit-mask-image: linear-gradient(135deg, black 40%, transparent 60%);
+  mask-image: linear-gradient(135deg, black 40%, transparent 60%);
+}
+
+.lc-player-panel.lc-fusion-bg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--bg-image-2, none);
+  background-size: 180%;
+  background-position: 70% center;
+  background-repeat: no-repeat;
+  opacity: 0.4;
+  filter: brightness(0.7);
+  z-index: 0;
+  -webkit-mask-image: linear-gradient(135deg, transparent 40%, black 60%);
+  mask-image: linear-gradient(135deg, transparent 40%, black 60%);
+}
+
+/* Rotaciones para fusion en top player */
+.lc-player-panel.lc-fusion-bg.top-player::before,
+.lc-player-panel.lc-fusion-bg.top-player::after {
+  transform: rotate(180deg);
+}
+
 /* ========================================
    ROTACIONES POR ORIENTACIÓN DEL DISPOSITIVO
    ======================================== */
@@ -1857,6 +1891,23 @@
 
 .lc-background-option:hover {
   transform: scale(1.05);
+}
+
+.lc-bg-upload,
+.lc-bg-fusion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.lc-bg-upload:hover,
+.lc-bg-fusion:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.lc-bg-fusion.selected {
+  border-style: solid;
 }
 
 /* Team Selection Modal */

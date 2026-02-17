@@ -2,15 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useLeaderboard } from '../context/LeaderboardContext';
 import './Admin.css';
 
+const COLORS = [
+    { code: 'W', label: 'White', image: '/white-mana.png' },
+    { code: 'U', label: 'Blue', image: '/blue-mana.png' },
+    { code: 'B', label: 'Black', image: '/black-mana.png' },
+    { code: 'R', label: 'Red', image: '/red-mana.png' },
+    { code: 'G', label: 'Green', image: '/green-mana.png' }
+];
+
+const POINTS_SYSTEM = [5, 2, 1, 0];
+
 const Admin = () => {
-    const { users, matches, updateScore, logMatch, deleteMatch, resetScores, clearHistory } = useLeaderboard();
+    const { users, matches, updateScore, logMatch, deleteMatch, resetScores, clearHistory, setLastPointsGained } = useLeaderboard();
     const [activeTab, setActiveTab] = useState('scores');
 
     // --- SCORE MANAGEMENT ---
-    // Local state for scores to allow "Apply" workflow
     const [localScores, setLocalScores] = useState({});
 
-    // Initialize local scores when users changes (or on mount)
     useEffect(() => {
         const initial = {};
         users.forEach(u => {
@@ -30,13 +38,10 @@ const Admin = () => {
     };
 
     const applyScores = () => {
-        // Iterate localScores and update context one by one (or could bulk update if context supported it)
         Object.keys(localScores).forEach(userId => {
             Object.keys(localScores[userId]).forEach(modality => {
+                if (modality === 'overall') return;
                 const val = localScores[userId][modality];
-                // Only update if changed? For simplicity, update all.
-                // But wait, updateScore triggers re-render/localStorage save each time.
-                // It's fine for small N.
                 updateScore(userId, modality, val);
             });
         });
@@ -45,33 +50,42 @@ const Admin = () => {
 
     // --- MATCH LOGGING ---
     const [matchModality, setMatchModality] = useState('1v1');
-    // Dynamic player states. We'll store an array of player objects to handle 2 or 4 players.
     const [playersData, setPlayersData] = useState([
-        { id: 'rekaru', deck: '', colors: [], life: 20 },
-        { id: 'emi', deck: '', colors: [], life: 0 }
+        { id: 'rekaru', deck: '', colors: [], life: 20, placement: 1 },
+        { id: 'emi', deck: '', colors: [], life: 0, placement: 2 }
     ]);
     const [winnerId, setWinnerId] = useState('rekaru');
 
-    // Reset/Adjust form when modality changes
+    // 2v2 team state
+    const [teamsData, setTeamsData] = useState([
+        { members: ['', ''], deck: '', colors: [], life: 20, placement: 1 },
+        { members: ['', ''], deck: '', colors: [], life: 0, placement: 2 }
+    ]);
+
+    // Reset form when modality changes
     useEffect(() => {
         if (matchModality === 'commander') {
-            // Set up 4 players default
             setPlayersData([
-                { id: users[0]?.id || '', deck: '', colors: [], life: 40 },
-                { id: users[1]?.id || '', deck: '', colors: [], life: 40 },
-                { id: users[2]?.id || '', deck: '', colors: [], life: 40 },
-                { id: users[3]?.id || '', deck: '', colors: [], life: 40 }
+                { id: users[0]?.id || '', deck: '', colors: [], life: 40, placement: 1 },
+                { id: users[1]?.id || '', deck: '', colors: [], life: 40, placement: 2 },
+                { id: users[2]?.id || '', deck: '', colors: [], life: 40, placement: 3 },
+                { id: users[3]?.id || '', deck: '', colors: [], life: 40, placement: 4 }
             ]);
             setWinnerId(users[0]?.id || '');
+        } else if (matchModality === '2v2') {
+            setTeamsData([
+                { members: [users[0]?.id || '', users[1]?.id || ''], deck: '', colors: [], life: 20, placement: 1 },
+                { members: [users[2]?.id || '', users[3]?.id || ''], deck: '', colors: [], life: 0, placement: 2 }
+            ]);
+            setWinnerId('team1');
         } else {
-            // Back to 2 players (1v1, 2v2)
             setPlayersData([
-                { id: users[0]?.id || '', deck: '', colors: [], life: 20 },
-                { id: users[1]?.id || '', deck: '', colors: [], life: 0 }
+                { id: users[0]?.id || '', deck: '', colors: [], life: 20, placement: 1 },
+                { id: users[1]?.id || '', deck: '', colors: [], life: 0, placement: 2 }
             ]);
             setWinnerId(users[0]?.id || '');
         }
-    }, [matchModality, users]); // Added users to dependency array
+    }, [matchModality, users]);
 
     const updatePlayerField = (index, field, value) => {
         setPlayersData(prev => {
@@ -92,20 +106,123 @@ const Admin = () => {
         });
     };
 
+    const updateTeamField = (teamIndex, field, value) => {
+        setTeamsData(prev => {
+            const next = [...prev];
+            next[teamIndex] = { ...next[teamIndex], [field]: value };
+            return next;
+        });
+    };
+
+    const updateTeamMember = (teamIndex, memberIndex, value) => {
+        setTeamsData(prev => {
+            const next = [...prev];
+            const newMembers = [...next[teamIndex].members];
+            newMembers[memberIndex] = value;
+            next[teamIndex] = { ...next[teamIndex], members: newMembers };
+            return next;
+        });
+    };
+
+    const toggleTeamColor = (teamIndex, color) => {
+        setTeamsData(prev => {
+            const next = [...prev];
+            const currentColors = next[teamIndex].colors;
+            next[teamIndex].colors = currentColors.includes(color)
+                ? currentColors.filter(c => c !== color)
+                : [...currentColors, color];
+            return next;
+        });
+    };
+
     const submitMatch = (e) => {
         e.preventDefault();
-        logMatch({
-            modality: matchModality,
-            date: new Date().toISOString(),
-            winnerId: winnerId,
-            players: playersData.map(p => ({
+
+        if (matchModality === '2v2') {
+            // Build match data for 2v2
+            const winningTeamIndex = winnerId === 'team1' ? 0 : 1;
+            const losingTeamIndex = winningTeamIndex === 0 ? 1 : 0;
+            const winningTeam = teamsData[winningTeamIndex];
+            const losingTeam = teamsData[losingTeamIndex];
+
+            // Build players array with all 4 members
+            const allPlayers = [];
+            winningTeam.members.forEach(memberId => {
+                allPlayers.push({
+                    id: memberId,
+                    deck: winningTeam.deck,
+                    colors: winningTeam.colors,
+                    life: winningTeam.life,
+                    placement: winningTeam.placement
+                });
+            });
+            losingTeam.members.forEach(memberId => {
+                allPlayers.push({
+                    id: memberId,
+                    deck: losingTeam.deck,
+                    colors: losingTeam.colors,
+                    life: losingTeam.life,
+                    placement: losingTeam.placement
+                });
+            });
+
+            const winnersFirstMember = winningTeam.members[0];
+
+            logMatch({
+                modality: matchModality,
+                date: new Date().toISOString(),
+                winnerId: winnersFirstMember,
+                players: allPlayers
+            });
+
+            // Auto-update scores: winning team 4pts each, losing team 0pts
+            const newLastPoints = {};
+            winningTeam.members.forEach(memberId => {
+                const user = users.find(u => u.id === memberId);
+                if (user) {
+                    updateScore(memberId, matchModality, (user.scores[matchModality] || 0) + 4);
+                    newLastPoints[memberId] = { [matchModality]: 4 };
+                }
+            });
+            losingTeam.members.forEach(memberId => {
+                const user = users.find(u => u.id === memberId);
+                if (user) {
+                    newLastPoints[memberId] = { [matchModality]: 0 };
+                }
+            });
+            setLastPointsGained(newLastPoints);
+
+        } else {
+            // 1v1 or Commander
+            const matchPlayers = playersData.map(p => ({
                 id: p.id,
                 deck: p.deck,
                 colors: p.colors,
-                life: p.life
-            }))
-        });
-        alert('Match logged!');
+                life: p.life,
+                placement: p.placement
+            }));
+
+            logMatch({
+                modality: matchModality,
+                date: new Date().toISOString(),
+                winnerId: winnerId,
+                players: matchPlayers
+            });
+
+            // Auto-update scores based on placement
+            const newLastPoints = {};
+            playersData.forEach(p => {
+                const points = POINTS_SYSTEM[p.placement - 1] || 0;
+                const user = users.find(u => u.id === p.id);
+                if (user) {
+                    updateScore(p.id, matchModality, (user.scores[matchModality] || 0) + points);
+                    newLastPoints[p.id] = { [matchModality]: points };
+                }
+            });
+            setLastPointsGained(newLastPoints);
+        }
+
+        alert('Match logged & scores updated!');
     };
 
     // --- HISTORY MANAGEMENT ---
@@ -124,15 +241,19 @@ const Admin = () => {
         }
     };
 
-    const COLORS = [
-        { code: 'w', label: 'White' },
-        { code: 'u', label: 'Blue' },
-        { code: 'b', label: 'Black' },
-        { code: 'r', label: 'Red' },
-        { code: 'g', label: 'Green' }
-    ];
+    const getUserName = (id) => users.find(u => u.id === id)?.name || id || 'Unknown';
 
-    const getUserName = (id) => users.find(u => u.id === id)?.name || 'Unknown';
+    // Get all member IDs already assigned in teams (for filtering)
+    const getAssignedMembers = (excludeTeam, excludeMember) => {
+        const assigned = [];
+        teamsData.forEach((team, ti) => {
+            team.members.forEach((m, mi) => {
+                if (ti === excludeTeam && mi === excludeMember) return;
+                if (m) assigned.push(m);
+            });
+        });
+        return assigned;
+    };
 
     return (
         <div className="admin-container">
@@ -160,7 +281,7 @@ const Admin = () => {
                             <div key={user.id} className="player-card">
                                 <h3>{user.name}</h3>
                                 <div className="score-row">
-                                    {['1v1', '2v2', 'commander', 'overall'].map(mode => (
+                                    {['1v1', '2v2', 'commander'].map(mode => (
                                         <div key={mode} className="score-field">
                                             <label>{mode.toUpperCase()}</label>
                                             <input
@@ -195,67 +316,175 @@ const Admin = () => {
                         </select>
                     </div>
 
-                    <div className="match-form" style={{ gridTemplateColumns: matchModality === 'commander' ? '1fr' : '1fr 1fr' }}>
-                        {playersData.map((player, index) => (
-                            <div key={index} className="player-card">
-                                <h3>Player {index + 1}</h3>
-                                <select
-                                    value={player.id}
-                                    onChange={e => updatePlayerField(index, 'id', e.target.value)}
-                                    style={{ width: '100%', marginBottom: '1rem' }}
-                                >
-                                    {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                                </select>
+                    {matchModality === '2v2' ? (
+                        /* --- 2v2 TEAM CARDS --- */
+                        <div className="match-form" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                            {teamsData.map((team, teamIndex) => (
+                                <div key={teamIndex} className="player-card">
+                                    <h3>Team {teamIndex + 1}</h3>
 
-                                <div className="score-field">
-                                    <label>Deck Name</label>
-                                    <input
-                                        type="text"
-                                        value={player.deck}
-                                        onChange={e => updatePlayerField(index, 'deck', e.target.value)}
-                                        placeholder="e.g. Goblins"
-                                    />
-                                </div>
+                                    {team.members.map((memberId, memberIndex) => {
+                                        const assigned = getAssignedMembers(teamIndex, memberIndex);
+                                        return (
+                                            <div key={memberIndex} className="score-field" style={{ marginBottom: '0.75rem' }}>
+                                                <label>Member {memberIndex + 1}</label>
+                                                <select
+                                                    value={memberId}
+                                                    onChange={e => updateTeamMember(teamIndex, memberIndex, e.target.value)}
+                                                    style={{ width: '100%' }}
+                                                >
+                                                    <option value="">Select player...</option>
+                                                    {users.map(u => (
+                                                        <option key={u.id} value={u.id} disabled={assigned.includes(u.id)}>
+                                                            {u.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        );
+                                    })}
 
-                                <div className="score-field" style={{ marginTop: '1rem' }}>
-                                    <label>Deck Colors</label>
-                                    <div className="deck-colors">
-                                        {COLORS.map(c => (
-                                            <div
-                                                key={c.code}
-                                                className={`color-option color-${c.code} ${player.colors.includes(c.code) ? 'selected' : ''}`}
-                                                onClick={() => togglePlayerColor(index, c.code)}
-                                                title={c.label}
-                                            />
-                                        ))}
+                                    <div className="score-field" style={{ marginTop: '1rem' }}>
+                                        <label>Deck Name</label>
+                                        <input
+                                            type="text"
+                                            value={team.deck}
+                                            onChange={e => updateTeamField(teamIndex, 'deck', e.target.value)}
+                                            placeholder="e.g. Boros Aggro"
+                                        />
+                                    </div>
+
+                                    <div className="score-field" style={{ marginTop: '1rem' }}>
+                                        <label>Deck Colors</label>
+                                        <div className="deck-colors">
+                                            {COLORS.map(c => (
+                                                <img
+                                                    key={c.code}
+                                                    src={c.image}
+                                                    alt={c.label}
+                                                    className={`mana-color-option ${team.colors.includes(c.code) ? 'selected' : ''}`}
+                                                    onClick={() => toggleTeamColor(teamIndex, c.code)}
+                                                    title={c.label}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="score-field" style={{ marginTop: '1rem' }}>
+                                        <label>Life / Score</label>
+                                        <input
+                                            type="number"
+                                            value={team.life}
+                                            onChange={e => updateTeamField(teamIndex, 'life', Number(e.target.value))}
+                                        />
+                                    </div>
+
+                                    <div className="score-field" style={{ marginTop: '1rem' }}>
+                                        <label>Placement (#)</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            max="2"
+                                            value={team.placement}
+                                            onChange={e => updateTeamField(teamIndex, 'placement', Number(e.target.value))}
+                                        />
                                     </div>
                                 </div>
+                            ))}
+                        </div>
+                    ) : (
+                        /* --- 1v1 / COMMANDER PLAYER CARDS --- */
+                        <div className="match-form" style={{ gridTemplateColumns: matchModality === 'commander' ? '1fr' : '1fr 1fr' }}>
+                            {playersData.map((player, index) => (
+                                <div key={index} className="player-card">
+                                    <h3>Player {index + 1}</h3>
+                                    <select
+                                        value={player.id}
+                                        onChange={e => updatePlayerField(index, 'id', e.target.value)}
+                                        style={{ width: '100%', marginBottom: '1rem' }}
+                                    >
+                                        {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                                    </select>
 
-                                <div className="score-field" style={{ marginTop: '1rem' }}>
-                                    <label>Life / Score</label>
-                                    <input
-                                        type="number"
-                                        value={player.life}
-                                        onChange={e => updatePlayerField(index, 'life', e.target.value)}
-                                    />
+                                    <div className="score-field">
+                                        <label>Deck Name</label>
+                                        <input
+                                            type="text"
+                                            value={player.deck}
+                                            onChange={e => updatePlayerField(index, 'deck', e.target.value)}
+                                            placeholder="e.g. Goblins"
+                                        />
+                                    </div>
+
+                                    <div className="score-field" style={{ marginTop: '1rem' }}>
+                                        <label>Deck Colors</label>
+                                        <div className="deck-colors">
+                                            {COLORS.map(c => (
+                                                <img
+                                                    key={c.code}
+                                                    src={c.image}
+                                                    alt={c.label}
+                                                    className={`mana-color-option ${player.colors.includes(c.code) ? 'selected' : ''}`}
+                                                    onClick={() => togglePlayerColor(index, c.code)}
+                                                    title={c.label}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="score-field" style={{ marginTop: '1rem' }}>
+                                        <label>Life / Score</label>
+                                        <input
+                                            type="number"
+                                            value={player.life}
+                                            onChange={e => updatePlayerField(index, 'life', Number(e.target.value))}
+                                        />
+                                    </div>
+
+                                    <div className="score-field" style={{ marginTop: '1rem' }}>
+                                        <label>Placement (#)</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            max={playersData.length}
+                                            value={player.placement}
+                                            onChange={e => updatePlayerField(index, 'placement', Number(e.target.value))}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
 
+                    {/* Winner selector */}
                     <div style={{ marginTop: '2rem' }}>
                         <label>Winner</label>
-                        <select
-                            value={winnerId}
-                            onChange={e => setWinnerId(e.target.value)}
-                            style={{ width: '100%', padding: '1rem', fontSize: '1.2rem', marginTop: '0.5rem' }}
-                        >
-                            {playersData.map((p, i) => (
-                                <option key={i} value={p.id}>
-                                    Player {i + 1} ({users.find(u => u.id === p.id)?.name || 'Unknown'})
+                        {matchModality === '2v2' ? (
+                            <select
+                                value={winnerId}
+                                onChange={e => setWinnerId(e.target.value)}
+                                style={{ width: '100%', padding: '1rem', fontSize: '1.2rem', marginTop: '0.5rem' }}
+                            >
+                                <option value="team1">
+                                    Team 1 ({teamsData[0].members.map(m => getUserName(m)).join(' & ')})
                                 </option>
-                            ))}
-                        </select>
+                                <option value="team2">
+                                    Team 2 ({teamsData[1].members.map(m => getUserName(m)).join(' & ')})
+                                </option>
+                            </select>
+                        ) : (
+                            <select
+                                value={winnerId}
+                                onChange={e => setWinnerId(e.target.value)}
+                                style={{ width: '100%', padding: '1rem', fontSize: '1.2rem', marginTop: '0.5rem' }}
+                            >
+                                {playersData.map((p, i) => (
+                                    <option key={i} value={p.id}>
+                                        Player {i + 1} ({getUserName(p.id)})
+                                    </option>
+                                ))}
+                            </select>
+                        )}
                     </div>
 
                     <button type="submit" className="btn" style={{ marginTop: '2rem', width: '100%' }}>
@@ -307,7 +536,7 @@ const Admin = () => {
                                                     fontWeight: p.id === m.winnerId ? 'bold' : 'normal',
                                                     borderBottom: p.id === m.winnerId ? '1px solid #fbbf24' : 'none'
                                                 }}>
-                                                    {getUserName(p.id)} ({p.life})
+                                                    {p.placement && `#${p.placement} `}{getUserName(p.id)} ({p.life})
                                                 </span>
                                             ))}
                                         </div>
