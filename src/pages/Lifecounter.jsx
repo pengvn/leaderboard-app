@@ -3,7 +3,16 @@ import { useLeaderboard } from '../context/LeaderboardContext';
 import NavMenu from '../components/NavMenu';
 import './Lifecounter.css';
 
-const PREDEFINED_PLAYERS = ['Pengvn', 'Rekatria', 'Hwan', 'Emi'];
+// Configuración unificada de jugadores
+const PLAYERS_CONFIG = [
+  { name: 'Pengvn',   id: 'pengvn', bg: '/assets/pengvn.jpg' },
+  { name: 'Rekatria', id: 'rekaru', bg: '/assets/rekaru.jpg' },
+  { name: 'Hwan',     id: 'hwan',   bg: '/assets/hwan.jpg' },
+  { name: 'Emi',      id: 'emi',    bg: '/assets/emi.jpg' },
+];
+const PREDEFINED_PLAYERS = PLAYERS_CONFIG.map(p => p.name);
+const DEFAULT_BACKGROUNDS = Object.fromEntries(PLAYERS_CONFIG.map(p => [p.name, p.bg]));
+const PLAYER_ID_MAP = Object.fromEntries(PLAYERS_CONFIG.map(p => [p.name, p.id]));
 
 const PLAYER_COLORS = [
   { name: 'Blanco', value: '#f5f5f5' },
@@ -55,21 +64,19 @@ const COUNTER_TYPES = [
   { id: 'colorless', name: 'Maná Incoloro', icon: '⬜' },
 ];
 
-// Mapeo de nombres a imagen de fondo por defecto
-const DEFAULT_BACKGROUNDS = {
-  'Pengvn': '/assets/pengvn.jpg',
-  'Rekatria': '/assets/rekaru.jpg',
-  'Hwan': '/assets/hwan.jpg',
-  'Emi': '/assets/emi.jpg'
+// Constantes de puntuación
+const SAVE_PASSWORD = 'mtg2026';
+const POINTS_SYSTEM = [5, 2, 1, 0];
+const MODALITY_MAP = { '1v1': '1v1', '2v2': '2v2', 'Commander': 'commander', 'Three-way': '1v1' };
+const POSITION_MAPS = {
+  '1v1':       ['top-player', 'bottom-player'],
+  '2v2':       ['top-player', 'bottom-player'],
+  'Commander': ['top-left-player', 'top-right-player', 'bottom-left-player', 'bottom-right-player'],
+  'Three-way': ['top-player', 'bottom-left-player', 'bottom-right-player'],
 };
 
-// Mapeo de nombres a IDs del leaderboard
-const PLAYER_ID_MAP = {
-  'Pengvn': 'pengvn',
-  'Rekatria': 'rekaru',
-  'Hwan': 'hwan',
-  'Emi': 'emi'
-};
+// Helper para detectar uploads custom
+const isCustomUpload = (img) => img && img !== 'fusion' && !BACKGROUND_IMAGES.some(bg => bg.url === img);
 
 function Lifecounter() {
   const { logMatch, updateScore, users: leaderboardUsers, setLastPointsGained } = useLeaderboard();
@@ -83,7 +90,6 @@ function Lifecounter() {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showRoundChange, setShowRoundChange] = useState(false);
-  const [newRoundNumber, setNewRoundNumber] = useState(1);
   const [firstPlayer, setFirstPlayer] = useState(0);
   const [showHighRoll, setShowHighRoll] = useState(false);
   const [highRollWinner, setHighRollWinner] = useState(null);
@@ -106,6 +112,8 @@ function Lifecounter() {
   const menuButtonLongPressTriggered = useRef(false);
   const fileInputRef = useRef(null);
   const [uploadTargetPlayer, setUploadTargetPlayer] = useState(null);
+
+  const modeSlug = gameMode?.toLowerCase().replace(/[^a-z0-9]/g, '') || '';
 
   const initializePlayers = (count, life, isTeamMode = false, teams = null) => {
     const newPlayers = [];
@@ -208,27 +216,7 @@ function Lifecounter() {
     }
   };
 
-  // Determinar posición específica del jugador para aplicar rotaciones
-  const getPlayerPositionClass = (playerId) => {
-    if (gameMode === '1v1' || gameMode === '2v2') {
-      // 2 asientos: solo arriba y abajo
-      return playerId === 0 ? 'top-player' : 'bottom-player';
-    }
-
-    if (gameMode === 'Commander') {
-      // 4 asientos: arriba-izq, arriba-der, abajo-izq, abajo-der
-      const positions = ['top-left-player', 'top-right-player', 'bottom-left-player', 'bottom-right-player'];
-      return positions[playerId] || '';
-    }
-
-    if (gameMode === 'Three-way') {
-      // 3 asientos: 1 arriba (ocupa todo), 2 abajo
-      const positions = ['top-player', 'bottom-left-player', 'bottom-right-player'];
-      return positions[playerId] || '';
-    }
-
-    return '';
-  };
+  const getPlayerPositionClass = (playerId) => POSITION_MAPS[gameMode]?.[playerId] ?? '';
 
   const startGame = () => {
     setShowHighRoll(true);
@@ -354,12 +342,10 @@ function Lifecounter() {
     setCurrentTurn(nextPlayer);
 
     if (isNewRound && turnNumber > 0) {
-      const newRound = turnNumber + 1;
-      setNewRoundNumber(newRound);
       setShowRoundChange(true);
       setTimeout(() => {
         setShowRoundChange(false);
-        setTurnNumber(newRound);
+        setTurnNumber(turnNumber + 1);
       }, 2000);
     }
   };
@@ -400,9 +386,6 @@ function Lifecounter() {
   };
 
   const saveResults = () => {
-    // Validar contraseña (puedes cambiar "mtg2026" por la que quieras)
-    const SAVE_PASSWORD = 'mtg2026';
-
     if (password !== SAVE_PASSWORD) {
       setPasswordError('Contraseña incorrecta');
       return;
@@ -416,18 +399,7 @@ function Lifecounter() {
     // Ordenar jugadores por vida (mayor a menor) para determinar posiciones
     const sortedPlayers = [...players].sort((a, b) => b.life - a.life);
 
-    // Sistema de puntos: 1° = 5pts, 2° = 2pts, 3° = 1pt, 4° = 0pts
-    const pointsSystem = [5, 2, 1, 0];
-
-    // Mapear gameMode a modalidad del leaderboard
-    const modalityMap = {
-      '1v1': '1v1',
-      '2v2': '2v2',
-      'Commander': 'commander',
-      'Three-way': '1v1'
-    };
-
-    const modality = modalityMap[gameMode] || '1v1';
+    const modality = MODALITY_MAP[gameMode] || '1v1';
 
     // Calcular puestos basados en orden de muerte
     // deathOrder tiene los IDs en orden de muerte (primero = murió primero = último puesto)
@@ -483,7 +455,7 @@ function Lifecounter() {
       // Modos individuales: 5, 2, 1, 0 según posición
       sortedPlayers.forEach((player, index) => {
         const playerId = PLAYER_ID_MAP[player.name] || player.name.toLowerCase();
-        const points = pointsSystem[index] || 0;
+        const points = POINTS_SYSTEM[index] || 0;
 
         const user = leaderboardUsers.find(u => u.id === playerId);
         if (user) {
@@ -509,7 +481,7 @@ function Lifecounter() {
     } else {
       sortedPlayers.forEach((player, index) => {
         const pid = PLAYER_ID_MAP[player.name] || player.name.toLowerCase();
-        const pts = pointsSystem[index] || 0;
+        const pts = POINTS_SYSTEM[index] || 0;
         newLastPoints[pid] = { [modality]: pts };
       });
     }
@@ -757,7 +729,7 @@ function Lifecounter() {
                       </div>
                     )}
                     <div
-                      className={`lc-background-option lc-bg-upload ${player.backgroundImage && player.backgroundImage !== 'fusion' && !BACKGROUND_IMAGES.some(bg => bg.url === player.backgroundImage) ? 'selected' : ''}`}
+                      className={`lc-background-option lc-bg-upload ${isCustomUpload(player.backgroundImage) ? 'selected' : ''}`}
                       style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
                       onClick={() => {
                         setUploadTargetPlayer(player.id);
@@ -784,7 +756,7 @@ function Lifecounter() {
       {/* Tablero de Juego */}
       {screen === 'game' && (
         <div className="lc-screen lc-game-screen">
-          <div className={`lc-game-board lc-mode-${gameMode.toLowerCase().replace(/[^a-z0-9]/g, '')} lc-orientation-landscape`}>
+          <div className={`lc-game-board lc-mode-${modeSlug} lc-orientation-landscape`}>
             {players.map(player => (
               <div
                 key={player.id}
@@ -980,7 +952,7 @@ function Lifecounter() {
                   </div>
                 )}
                 <div
-                  className={`lc-background-option lc-bg-upload ${players[selectedPlayer]?.backgroundImage && players[selectedPlayer]?.backgroundImage !== 'fusion' && !BACKGROUND_IMAGES.some(bg => bg.url === players[selectedPlayer]?.backgroundImage) ? 'selected' : ''}`}
+                  className={`lc-background-option lc-bg-upload ${isCustomUpload(players[selectedPlayer]?.backgroundImage) ? 'selected' : ''}`}
                   style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
                   onClick={() => {
                     setUploadTargetPlayer(selectedPlayer);
@@ -1167,7 +1139,7 @@ function Lifecounter() {
             )}
 
             {/* Tablero de asientos */}
-            <div className={`lc-seat-grid lc-mode-${gameMode.toLowerCase().replace(/[^a-z0-9]/g, '')}`}>
+            <div className={`lc-seat-grid lc-mode-${modeSlug}`}>
               {Array.from({ length: playerCount }).map((_, index) => (
                 <div
                   key={index}
@@ -1229,7 +1201,7 @@ function Lifecounter() {
       {showRoundChange && (
         <div className="lc-round-change-overlay">
           <div className="lc-round-change-banner">
-            <h2>Ronda {newRoundNumber}</h2>
+            <h2>Ronda {turnNumber + 1}</h2>
           </div>
         </div>
       )}
