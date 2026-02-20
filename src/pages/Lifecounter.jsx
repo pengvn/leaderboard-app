@@ -94,6 +94,7 @@ function Lifecounter() {
   const [showHighRoll, setShowHighRoll] = useState(false);
   const [highRollWinner, setHighRollWinner] = useState(null);
   const [showHighRollResult, setShowHighRollResult] = useState(false);
+  const [highRollRolling, setHighRollRolling] = useState(false);
   const [victoryDetected, setVictoryDetected] = useState(false);
   const [deathOrder, setDeathOrder] = useState([]); // Orden de muerte de jugadores [playerId, ...]
   const [seatAssignment, setSeatAssignment] = useState({}); // {seatIndex: playerName}
@@ -105,6 +106,15 @@ function Lifecounter() {
   const [showPasswordPrompt, setShowPasswordPrompt] = useState(false); // Modal de contraseña
   const [password, setPassword] = useState(''); // Input de contraseña
   const [passwordError, setPasswordError] = useState(''); // Error de contraseña
+
+  // Timer por turno
+  const [timerDuration, setTimerDuration] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [timerActive, setTimerActive] = useState(false);
+  const [timerEnabled, setTimerEnabled] = useState(false);
+  const [timerResetId, setTimerResetId] = useState(0);
+  const timerIntervalRef = useRef(null);
+  const timeLeftRef = useRef(60);
 
   const longPressTimer = useRef(null);
   const longPressInterval = useRef(null);
@@ -223,21 +233,25 @@ function Lifecounter() {
   };
 
   const performHighRoll = () => {
-    // High roll aleatorio
-    const randomPlayer = Math.floor(Math.random() * playerCount);
-    setHighRollWinner(randomPlayer);
-    setShowHighRollResult(true);
+    if (highRollRolling) return;
+    setHighRollRolling(true);
 
-    // Después de 2.5 segundos, iniciar el juego
     setTimeout(() => {
-      setFirstPlayer(randomPlayer);
-      setCurrentTurn(randomPlayer);
-      setTurnNumber(1);
-      setShowHighRoll(false);
-      setShowHighRollResult(false);
-      setHighRollWinner(null);
-      setScreen('game');
-    }, 2500);
+      const randomPlayer = Math.floor(Math.random() * playerCount);
+      setHighRollWinner(randomPlayer);
+      setHighRollRolling(false);
+      setShowHighRollResult(true);
+
+      setTimeout(() => {
+        setFirstPlayer(randomPlayer);
+        setCurrentTurn(randomPlayer);
+        setTurnNumber(1);
+        setShowHighRoll(false);
+        setShowHighRollResult(false);
+        setHighRollWinner(null);
+        setScreen('game');
+      }, 2500);
+    }, 1200);
   };
 
   const updatePlayer = (playerId, updates) => {
@@ -348,6 +362,34 @@ function Lifecounter() {
         setTurnNumber(turnNumber + 1);
       }, 2000);
     }
+
+    if (timerEnabled) resetTimer();
+  };
+
+  const clearTimer = () => {
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
+    }
+  };
+
+  const resetTimer = () => {
+    clearTimer();
+    timeLeftRef.current = timerDuration;
+    setTimeLeft(timerDuration);
+    setTimerActive(true);
+    setTimerResetId(prev => prev + 1); // Fuerza re-ejecución del effect aunque timerActive ya era true
+  };
+
+  const toggleTimerPause = () => {
+    setTimerActive(prev => !prev);
+  };
+
+  const changeDuration = (duration) => {
+    setTimerDuration(duration);
+    timeLeftRef.current = duration;
+    setTimeLeft(duration);
+    setTimerResetId(prev => prev + 1);
   };
 
   const toggleFullscreen = () => {
@@ -552,6 +594,28 @@ function Lifecounter() {
     }
   }, [screen, gameMode, playerCount, startingLife, players, currentTurn, turnNumber, firstPlayer, seatAssignment]);
 
+  // Timer por turno
+  useEffect(() => {
+    if (!timerEnabled || screen !== 'game') {
+      clearTimer();
+      return;
+    }
+    if (timerActive) {
+      timerIntervalRef.current = setInterval(() => {
+        timeLeftRef.current -= 1;
+        setTimeLeft(timeLeftRef.current);
+        if (timeLeftRef.current <= 0) {
+          clearTimer();
+          setTimerActive(false);
+          nextTurn();
+        }
+      }, 1000);
+    } else {
+      clearTimer();
+    }
+    return () => clearTimer();
+  }, [timerActive, timerEnabled, screen, timerResetId]);
+
   // Cargar sesión guardada al montar el componente
   useEffect(() => {
     const savedSession = localStorage.getItem('lifecounter_session');
@@ -606,41 +670,28 @@ function Lifecounter() {
       {/* Selección de Modo */}
       {screen === 'mode' && (
         <div className="lc-screen lc-mode-screen">
-          <div className="lc-screen-header">
-            <button className="lc-btn lc-btn-back" onClick={() => setScreen('welcome')}>← Atrás</button>
-            <h2>Modo de Juego</h2>
-          </div>
-
+          <button className="lc-btn lc-btn-back lc-mode-back-btn" onClick={() => setScreen('welcome')}>
+            ← Atrás
+          </button>
           <div className="lc-game-modes">
-            {/* NOTA: Para editar diseño de modos:
-                - Iconos: cambiar className="lc-mode-icon"
-                - Vidas iniciales: tercer parámetro (20 o 40)
-                - Número de asientos: segundo parámetro
-                  * 1v1: 2 asientos
-                  * 2v2: 4 asientos (o 2 para equipos)
-                  * Commander: 4 asientos
-                  * Three-way: 3 asientos
-            */}
-            <button className="lc-mode-card" onClick={() => selectGameMode('1v1', 2, 20)}>
-              <div className="lc-mode-icon">⚔️</div>
-              <h3>1v1</h3>
-              <p>Standard • 2 jugadores • 20 vidas</p>
-            </button>
-            <button className="lc-mode-card" onClick={() => selectGameMode('2v2', 4, 20)}>
-              <div className="lc-mode-icon">🤝</div>
-              <h3>2v2</h3>
-              <p>Equipos • 4 jugadores • 20 vidas</p>
-            </button>
-            <button className="lc-mode-card" onClick={() => selectGameMode('Three-way', 3, 20)}>
-              <div className="lc-mode-icon">🔺</div>
-              <h3>Three-way</h3>
-              <p>Free-for-all • 3 jugadores • 20 vidas</p>
-            </button>
-            <button className="lc-mode-card" onClick={() => selectGameMode('Commander', 4, 40)}>
-              <div className="lc-mode-icon">👑</div>
-              <h3>Commander</h3>
-              <p>Free-for-all • 4 jugadores • 40 vidas</p>
-            </button>
+            {[
+              { mode: '1v1',       count: 2, life: 20, img: '/1v1.png',       label: '1v1',       sub: 'Standard · 2 jugadores · 20 vidas' },
+              { mode: '2v2',       count: 4, life: 20, img: '/2v2.png',       label: '2v2',       sub: 'Equipos · 4 jugadores · 20 vidas' },
+              { mode: 'Three-way', count: 3, life: 20, img: '/threeway.png',  label: 'Three-way', sub: 'Free-for-all · 3 jugadores · 20 vidas' },
+              { mode: 'Commander', count: 4, life: 40, img: '/commander.png', label: 'Commander', sub: 'Free-for-all · 4 jugadores · 40 vidas' },
+            ].map((card, idx) => (
+              <button
+                key={card.mode}
+                className="lc-mode-card"
+                style={{ '--card-bg': `url(${card.img})`, '--card-delay': `${idx * 0.08}s` }}
+                onClick={() => selectGameMode(card.mode, card.count, card.life)}
+              >
+                <div className="lc-mode-card-overlay">
+                  <h3 className="lc-mode-card-title">{card.label}</h3>
+                  <p className="lc-mode-card-sub">{card.sub}</p>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       )}
@@ -844,6 +895,23 @@ function Lifecounter() {
                     </div>
                   </div>
                 )}
+
+                {/* Timer por asiento - orientado según la rotación del panel */}
+                {timerEnabled && currentTurn === player.id && (
+                  <div
+                    className={`lc-seat-timer${!timerActive ? ' lc-timer-paused' : ''}${timeLeft <= 10 ? ' lc-timer-critical' : timeLeft <= 30 ? ' lc-timer-warning' : ''}`}
+                    onClick={e => { e.stopPropagation(); toggleTimerPause(); }}
+                    title={timerActive ? 'Pausar' : 'Reanudar'}
+                  >
+                    <div className="lc-fuse-track">
+                      <div className="lc-fuse-fill" style={{ width: `${(timeLeft / timerDuration) * 100}%` }} />
+                      {timerActive && (
+                        <div className="lc-fuse-spark" style={{ left: `${(timeLeft / timerDuration) * 100}%` }} />
+                      )}
+                    </div>
+                    <div className="lc-timer-label">{timerActive ? `${timeLeft}s` : '⏸'}</div>
+                  </div>
+                )}
               </div>
             ))}
 
@@ -891,6 +959,28 @@ function Lifecounter() {
             <button className="lc-btn lc-btn-block" onClick={() => setShowMenu(false)}>
               Continuar
             </button>
+            <button
+              className={`lc-btn lc-btn-block ${timerEnabled ? 'lc-btn-danger' : 'lc-btn-secondary'}`}
+              onClick={() => {
+                const next = !timerEnabled;
+                setTimerEnabled(next);
+                if (next) { resetTimer(); } else { clearTimer(); setTimerActive(false); }
+                setShowMenu(false);
+              }}
+            >
+              {timerEnabled ? `⏱ Desactivar Timer (${timerDuration}s)` : `⏱ Activar Timer (${timerDuration}s)`}
+            </button>
+            <div className="lc-timer-presets">
+              {[30, 45, 60, 90, 120].map(dur => (
+                <button
+                  key={dur}
+                  className={`lc-timer-preset-btn${timerDuration === dur ? ' lc-timer-preset-active' : ''}`}
+                  onClick={() => changeDuration(dur)}
+                >
+                  {dur}s
+                </button>
+              ))}
+            </div>
             <button className="lc-btn lc-btn-secondary lc-btn-block" onClick={toggleFullscreen}>
               ⛶ Pantalla Completa
             </button>
@@ -1166,32 +1256,51 @@ function Lifecounter() {
         </div>
       )}
 
-      {/* High Roll Modal */}
+      {/* High Roll */}
       {showHighRoll && (
-        <div className="lc-modal">
-          <div className="lc-modal-content lc-highroll-modal">
-            {!showHighRollResult ? (
-              <>
-                <h3>🎲 High Roll</h3>
-                <p className="lc-highroll-text">Determinar jugador inicial</p>
-                <div className="lc-dice-animation">
-                  <div className="lc-dice">🎲</div>
-                </div>
-                <button
-                  className="lc-btn lc-btn-primary lc-btn-large"
-                  onClick={performHighRoll}
+        <div className="lc-highroll-overlay">
+          {/* Board grid espejando el layout real */}
+          <div className={`lc-highroll-board lc-mode-${modeSlug}`}>
+            {players.map((player) => {
+              const isWinner = showHighRollResult && highRollWinner === player.id;
+              const isLoser  = showHighRollResult && highRollWinner !== player.id;
+              return (
+                <div
+                  key={player.id}
+                  className={`lc-highroll-panel ${getPlayerPositionClass(player.id)}${isWinner ? ' lc-highroll-winner' : ''}${isLoser ? ' lc-highroll-loser' : ''}`}
+                  style={{
+                    backgroundColor: player.color,
+                    '--bg-image': player.backgroundImage && player.backgroundImage !== 'fusion'
+                      ? `url(${player.backgroundImage})`
+                      : 'none',
+                  }}
                 >
-                  Lanzar Dados
-                </button>
-              </>
-            ) : (
-              <>
-                <h3>🎲 Ganador del High Roll</h3>
-                <div className="lc-highroll-winner-animation">
-                  <div className="lc-winner-name">{players[highRollWinner]?.name}</div>
-                  <p className="lc-winner-subtitle">empieza la partida</p>
+                  <div className="lc-highroll-panel-name">{player.name}</div>
                 </div>
-              </>
+              );
+            })}
+          </div>
+
+          {/* Centro: botón o resultado */}
+          <div className="lc-highroll-center">
+            {!showHighRollResult ? (
+              <button
+                className={`lc-highroll-btn${highRollRolling ? ' lc-highroll-rolling' : ''}`}
+                onClick={performHighRoll}
+                disabled={highRollRolling}
+              >
+                <span className="lc-highroll-dice">🎲</span>
+                {!highRollRolling && (
+                  <span className="lc-highroll-btn-label">High Roll</span>
+                )}
+              </button>
+            ) : (
+              <div className="lc-highroll-result-badge">
+                <div className="lc-highroll-result-name">
+                  {players[highRollWinner]?.name}
+                </div>
+                <div className="lc-highroll-result-sub">empieza la partida</div>
+              </div>
             )}
           </div>
         </div>
