@@ -1108,6 +1108,13 @@ function Lifecounter() {
       {showTeamSelection && (
         <div className="lc-modal">
           <div className="lc-modal-content lc-team-selection-modal">
+            <button
+              className="lc-btn lc-btn-secondary lc-btn-block"
+              style={{ marginBottom: '0.75rem' }}
+              onClick={() => { setShowTeamSelection(false); setTeamSelections({ team1: [], team2: [] }); setScreen('mode'); }}
+            >
+              ← Volver
+            </button>
             <h3>Formar Equipos (2v2)</h3>
             <p className="lc-assignment-text">Selecciona 2 jugadores para el Equipo 1</p>
 
@@ -1191,6 +1198,13 @@ function Lifecounter() {
       {showSeatAssignment && (
         <div className="lc-modal">
           <div className="lc-modal-content lc-seat-assignment-modal">
+            <button
+              className="lc-btn lc-btn-secondary lc-btn-block"
+              style={{ marginBottom: '0.75rem' }}
+              onClick={() => { setShowSeatAssignment(false); setSeatAssignment({}); setAssigningPlayer(null); }}
+            >
+              ← Volver
+            </button>
             <h3>Asignación de Asientos</h3>
             <p className="lc-assignment-text">
               {assigningPlayer
@@ -1269,7 +1283,6 @@ function Lifecounter() {
                   key={player.id}
                   className={`lc-highroll-panel ${getPlayerPositionClass(player.id)}${isWinner ? ' lc-highroll-winner' : ''}${isLoser ? ' lc-highroll-loser' : ''}`}
                   style={{
-                    backgroundColor: player.color,
                     '--bg-image': player.backgroundImage && player.backgroundImage !== 'fusion'
                       ? `url(${player.backgroundImage})`
                       : 'none',
@@ -1290,9 +1303,6 @@ function Lifecounter() {
                 disabled={highRollRolling}
               >
                 <span className="lc-highroll-dice">🎲</span>
-                {!highRollRolling && (
-                  <span className="lc-highroll-btn-label">High Roll</span>
-                )}
               </button>
             ) : (
               <div className="lc-highroll-result-badge">
