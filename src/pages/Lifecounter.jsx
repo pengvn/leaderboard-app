@@ -651,7 +651,7 @@ function Lifecounter() {
 
   return (
     <div className="lifecounter-app">
-      <NavMenu show={screen !== 'game'} />
+      <NavMenu show={screen === 'welcome'} />
 
       {/* Pantalla de Bienvenida */}
       {screen === 'welcome' && (
