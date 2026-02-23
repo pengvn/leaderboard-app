@@ -677,7 +677,7 @@ function Lifecounter() {
             {[
               { mode: '1v1',       count: 2, life: 20, img: '/1v1.png',       label: '1v1',       sub: 'Standard · 2 jugadores · 20 vidas' },
               { mode: '2v2',       count: 4, life: 20, img: '/2v2.png',       label: '2v2',       sub: 'Equipos · 4 jugadores · 20 vidas' },
-              { mode: 'Three-way', count: 3, life: 20, img: '/threeway.png',  label: 'Three-way', sub: 'Free-for-all · 3 jugadores · 20 vidas' },
+              { mode: 'Three-way', count: 3, life: 20, img: '/3v3.png',       label: 'Three-way', sub: 'Free-for-all · 3 jugadores · 20 vidas' },
               { mode: 'Commander', count: 4, life: 40, img: '/commander.png', label: 'Commander', sub: 'Free-for-all · 4 jugadores · 40 vidas' },
             ].map((card, idx) => (
               <button
